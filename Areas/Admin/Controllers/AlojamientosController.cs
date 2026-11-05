@@ -1,115 +1,16 @@
-using HuatulcoTravel.Models;
-using HuatulcoTravel.Services;
-using HuatulcoTravel.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
+using HuatulcoTravel.Models;using HuatulcoTravel.Services;using HuatulcoTravel.ViewModels;using Microsoft.AspNetCore.Authorization;using Microsoft.AspNetCore.Mvc;
 namespace HuatulcoTravel.Areas.Admin.Controllers;
-
-[Area("Admin")]
-[Authorize(Roles = "Administrador")]
-public class AlojamientosController : Controller
-{
-    private readonly IAlojamientoService _service;
-
-    public AlojamientosController(IAlojamientoService service)
-    {
-        _service = service;
-    }
-
-    public async Task<IActionResult> Index()
-    {
-        var datos = await _service.ObtenerTodosAsync();
-        return View(datos);
-    }
-
-    public IActionResult Crear() => View(new AlojamientoFormViewModel());
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Crear(AlojamientoFormViewModel model)
-    {
-        if (!ModelState.IsValid) return View(model);
-
-        var alojamiento = Mapear(model);
-        await _service.CrearAsync(alojamiento);
-
-        TempData["Mensaje"] = "El alojamiento se registró correctamente.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    public async Task<IActionResult> Editar(Guid id)
-    {
-        var item = await _service.ObtenerPorIdAsync(id);
-        if (item is null) return NotFound();
-
-        return View(new AlojamientoFormViewModel
-        {
-            Id = item.Id,
-            Nombre = item.Nombre,
-            Descripcion = item.Descripcion,
-            Tipo = item.Tipo,
-            CapacidadHuespedes = item.CapacidadHuespedes,
-            NumeroHabitaciones = item.NumeroHabitaciones,
-            NumeroBanos = item.NumeroBanos,
-            PrecioBasePorNoche = item.PrecioBasePorNoche,
-            Direccion = item.Direccion,
-            Latitud = item.Latitud,
-            Longitud = item.Longitud,
-            Estado = item.Estado
-        });
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Editar(Guid id, AlojamientoFormViewModel model)
-    {
-        if (id != model.Id) return BadRequest();
-        if (!ModelState.IsValid) return View(model);
-
-        var existente = await _service.ObtenerPorIdAsync(id);
-        if (existente is null) return NotFound();
-
-        existente.Nombre = model.Nombre;
-        existente.Descripcion = model.Descripcion;
-        existente.Tipo = model.Tipo;
-        existente.CapacidadHuespedes = model.CapacidadHuespedes;
-        existente.NumeroHabitaciones = model.NumeroHabitaciones;
-        existente.NumeroBanos = model.NumeroBanos;
-        existente.PrecioBasePorNoche = model.PrecioBasePorNoche;
-        existente.Direccion = model.Direccion;
-        existente.Latitud = model.Latitud;
-        existente.Longitud = model.Longitud;
-        existente.Estado = model.Estado;
-
-        await _service.ActualizarAsync(existente);
-        TempData["Mensaje"] = "El alojamiento se actualizó correctamente.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Eliminar(Guid id)
-    {
-        var eliminado = await _service.EliminarAsync(id);
-        if (!eliminado) return NotFound();
-
-        TempData["Mensaje"] = "El alojamiento se eliminó.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    private static Alojamiento Mapear(AlojamientoFormViewModel model) => new()
-    {
-        Nombre = model.Nombre,
-        Descripcion = model.Descripcion,
-        Tipo = model.Tipo,
-        CapacidadHuespedes = model.CapacidadHuespedes,
-        NumeroHabitaciones = model.NumeroHabitaciones,
-        NumeroBanos = model.NumeroBanos,
-        PrecioBasePorNoche = model.PrecioBasePorNoche,
-        Direccion = model.Direccion,
-        Latitud = model.Latitud,
-        Longitud = model.Longitud,
-        Estado = model.Estado
-    };
+[Area("Admin"),Authorize(Roles="Administrador")] public class AlojamientosController:Controller{
+ private readonly IAlojamientoService _service;private readonly IWebHostEnvironment _env;private const long MaxSize=5*1024*1024;private static readonly HashSet<string> Exts=[".jpg",".jpeg",".png",".webp"];
+ public AlojamientosController(IAlojamientoService service,IWebHostEnvironment env){_service=service;_env=env;}
+ public async Task<IActionResult> Index(bool incluirInactivos=false){ViewBag.IncluirInactivos=incluirInactivos;return View(await _service.ObtenerTodosAsync(incluirInactivos:incluirInactivos));}
+ [HttpGet]public IActionResult Crear()=>View(new AlojamientoFormViewModel());
+ [HttpPost,ValidateAntiForgeryToken]public async Task<IActionResult> Crear(AlojamientoFormViewModel model,List<IFormFile> fotografias){if(!ModelState.IsValid)return View(model);try{var a=Map(model);a.Imagenes=await SaveImages(fotografias);var first=a.Imagenes.FirstOrDefault();if(first!=null)a.ImagenPrincipalUrl="/uploads/alojamientos/"+Path.GetFileName(first.RutaArchivo);await _service.CrearAsync(a);TempData["Mensaje"]="Alojamiento registrado correctamente.";return RedirectToAction(nameof(Index));}catch(InvalidOperationException e){ModelState.AddModelError("fotografias",e.Message);return View(model);}}
+ [HttpGet]public async Task<IActionResult> Editar(Guid id){var a=await _service.ObtenerPorIdAsync(id);if(a==null)return NotFound();ViewBag.Imagenes=a.Imagenes;return View(ToVm(a));}
+ [HttpPost,ValidateAntiForgeryToken]public async Task<IActionResult> Editar(Guid id,AlojamientoFormViewModel model,List<IFormFile> fotografias){if(id!=model.Id)return BadRequest();if(!ModelState.IsValid){ViewBag.Imagenes=(await _service.ObtenerPorIdAsync(id))?.Imagenes??[];return View(model);}var a=await _service.ObtenerPorIdAsync(id);if(a==null)return NotFound();try{Copy(model,a);var imgs=await SaveImages(fotografias);foreach(var img in imgs){img.AlojamientoId=a.Id;a.Imagenes.Add(img);}if(string.IsNullOrEmpty(a.ImagenPrincipalUrl)&&imgs.Count>0)a.ImagenPrincipalUrl="/uploads/alojamientos/"+Path.GetFileName(imgs[0].RutaArchivo);await _service.ActualizarAsync(a);TempData["Mensaje"]="Alojamiento actualizado correctamente.";return RedirectToAction(nameof(Index));}catch(InvalidOperationException e){ViewBag.Imagenes=a.Imagenes;ModelState.AddModelError("fotografias",e.Message);return View(model);}}
+ [HttpPost,ValidateAntiForgeryToken]public async Task<IActionResult> Desactivar(Guid id){if(!await _service.DesactivarAsync(id))return NotFound();TempData["Mensaje"]="Alojamiento desactivado; se conservó su historial.";return RedirectToAction(nameof(Index));}
+ private async Task<List<ImagenAlojamiento>> SaveImages(List<IFormFile>? files){var list=new List<ImagenAlojamiento>();if(files==null)return list;var folder=Path.Combine(_env.WebRootPath,"uploads","alojamientos");Directory.CreateDirectory(folder);foreach(var f in files){if(f.Length==0)continue;if(f.Length>MaxSize)throw new InvalidOperationException("Cada fotografía debe pesar máximo 5 MB.");var ext=Path.GetExtension(f.FileName).ToLowerInvariant();if(!Exts.Contains(ext))throw new InvalidOperationException("Solo se permiten JPG, PNG o WEBP.");await using var src=f.OpenReadStream();var h=new byte[12];var n=await src.ReadAsync(h.AsMemory(0,12));bool ok=ext is ".jpg" or ".jpeg"?n>=3&&h[0]==255&&h[1]==216&&h[2]==255:ext==".png"?n>=8&&h.Take(8).SequenceEqual(new byte[]{137,80,78,71,13,10,26,10}):n>=12&&System.Text.Encoding.ASCII.GetString(h,0,4)=="RIFF"&&System.Text.Encoding.ASCII.GetString(h,8,4)=="WEBP";if(!ok)throw new InvalidOperationException("El archivo no contiene una imagen válida.");src.Position=0;var name=Guid.NewGuid().ToString("N")+ext;var path=Path.Combine(folder,name);await using(var dst=new FileStream(path,FileMode.CreateNew))await src.CopyToAsync(dst);list.Add(new ImagenAlojamiento{Id=Guid.NewGuid(),RutaArchivo=path,TextoAlternativo=Path.GetFileNameWithoutExtension(f.FileName),Orden=list.Count});}return list;}
+ private static Alojamiento Map(AlojamientoFormViewModel m)=>new(){Nombre=m.Nombre,Descripcion=m.Descripcion,Tipo=m.Tipo,CapacidadHuespedes=m.CapacidadHuespedes,NumeroHabitaciones=m.NumeroHabitaciones,NumeroBanos=m.NumeroBanos,PrecioBasePorNoche=m.PrecioBasePorNoche,Direccion=m.Direccion,Latitud=m.Latitud,Longitud=m.Longitud,Estado=m.Estado};
+ private static AlojamientoFormViewModel ToVm(Alojamiento a)=>new(){Id=a.Id,Nombre=a.Nombre,Descripcion=a.Descripcion,Tipo=a.Tipo,CapacidadHuespedes=a.CapacidadHuespedes,NumeroHabitaciones=a.NumeroHabitaciones,NumeroBanos=a.NumeroBanos,PrecioBasePorNoche=a.PrecioBasePorNoche,Direccion=a.Direccion,Latitud=a.Latitud,Longitud=a.Longitud,Estado=a.Estado};
+ private static void Copy(AlojamientoFormViewModel m,Alojamiento a){a.Nombre=m.Nombre;a.Descripcion=m.Descripcion;a.Tipo=m.Tipo;a.CapacidadHuespedes=m.CapacidadHuespedes;a.NumeroHabitaciones=m.NumeroHabitaciones;a.NumeroBanos=m.NumeroBanos;a.PrecioBasePorNoche=m.PrecioBasePorNoche;a.Direccion=m.Direccion;a.Latitud=m.Latitud;a.Longitud=m.Longitud;a.Estado=m.Estado;}
 }

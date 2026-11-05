@@ -28,6 +28,9 @@ namespace HuatulcoTravel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("CapacidadHuespedes")
                         .HasColumnType("integer");
 

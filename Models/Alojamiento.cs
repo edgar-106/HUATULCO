@@ -41,6 +41,7 @@ public class Alojamiento
     public string? ImagenPrincipalUrl { get; set; }
 
     public EstadoAlojamiento Estado { get; set; } = EstadoAlojamiento.Borrador;
+    public bool Activo { get; set; } = true; // Baja lógica.
 
     public DateTime FechaCreacionUtc { get; set; } = DateTime.UtcNow;
     public DateTime? FechaActualizacionUtc { get; set; }

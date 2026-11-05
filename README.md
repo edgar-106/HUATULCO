@@ -59,11 +59,34 @@ Abrir la dirección HTTPS que indique la terminal.
 - Catálogo de alojamientos: `/Alojamientos`
 - Administración de alojamientos: `/Admin/Alojamientos`
 
-El área administrativa requiere iniciar sesión con un usuario que tenga el rol `Administrador`. Este paquete crea los roles, pero deliberadamente NO crea una contraseña ni un administrador predeterminado. El siguiente paso es implementar el alta segura del primer administrador y las pantallas de autenticación.
+El área administrativa requiere iniciar sesión con un usuario que tenga el rol `Administrador`. La Etapa 2 incluye autenticación y creación segura del primer administrador mediante User Secrets; consulta las instrucciones de la sección Etapa 2.
 
 ## Importante
 
 - XAMPP/Apache no ejecuta directamente ASP.NET Core MVC. Para desarrollo local se utiliza Kestrel con `dotnet run`.
 - No subir `appsettings.json` con credenciales reales a GitHub.
-- El CRUD inicial de alojamientos es una base de desarrollo. Antes de producción se debe implementar baja lógica, carga segura de imágenes, auditoría y pruebas.
+- El CRUD de alojamientos es una base de desarrollo. Antes de producción se requiere auditoría, escaneo de archivos y pruebas.
 - La validación de disponibilidad y el flujo de pagos aún no están implementados; son los siguientes módulos.
+
+
+## Etapa 2: autenticación y administración
+
+Incluye registro de clientes, inicio/cierre de sesión, bootstrap del primer administrador por User Secrets, baja lógica y carga múltiple de imágenes JPG/PNG/WEBP (máximo 5 MB por archivo).
+
+### Crear el primer administrador (solo una vez)
+Antes de iniciar la aplicación, configura: 
+```bash
+dotnet user-secrets set "BootstrapAdmin:Email" "admin@tudominio.com"
+dotnet user-secrets set "BootstrapAdmin:Password" "UnaClaveLarga!2026"
+dotnet user-secrets set "BootstrapAdmin:Name" "Administrador principal"
+```
+Inicia la aplicación una vez; el administrador se crea solo si todavía no existe uno. Después elimina esos secretos con `dotnet user-secrets remove "BootstrapAdmin:Email"` y lo mismo para Password y Name. No publiques credenciales en GitHub.
+
+### Migración si ya aplicaste InitialCreate
+```bash
+dotnet ef migrations add AddAlojamientoActivo
+dotnet ef database update
+```
+Si todavía no aplicaste migraciones, genera la migración inicial con el modelo actualizado.
+
+La carga guarda imágenes bajo `wwwroot/uploads/alojamientos`. Para producción se requiere revisión de seguridad, escaneo de archivos, almacenamiento dedicado, recuperación de contraseña, confirmación de correo, rate limiting y pruebas automatizadas.

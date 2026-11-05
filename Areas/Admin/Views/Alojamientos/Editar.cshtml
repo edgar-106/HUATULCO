@@ -5,7 +5,7 @@
 }
 <div class="container py-5">
     <h1 class="h2 fw-bold mb-4">@ViewData["Title"]</h1>
-    <form method="post" class="row g-3">
+    <form method="post" enctype="multipart/form-data" class="row g-3">
         @Html.AntiForgeryToken()
         <input asp-for="Id" type="hidden" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -53,6 +53,7 @@
             <label asp-for="Longitud" class="form-label"></label>
             <input asp-for="Longitud" class="form-control" type="number" step="any" />
         </div>
+        <div class="col-12"><label class="form-label" for="fotografias">Fotografías del alojamiento</label><input class="form-control" type="file" id="fotografias" name="fotografias" accept=".jpg,.jpeg,.png,.webp" multiple /><div class="form-text">JPG, PNG o WEBP; máximo 5 MB por imagen.</div></div>
         <div class="col-md-6">
             <label asp-for="Estado" class="form-label"></label>
             <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoAlojamiento>()" class="form-select"></select>
