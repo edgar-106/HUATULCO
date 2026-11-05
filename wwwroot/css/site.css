@@ -1,0 +1,26 @@
+:root {
+    --brand: #0d6470;
+    --brand-dark: #083d49;
+    --sand: #f4f1e9;
+}
+html { font-size: 16px; }
+body { color: #20343a; background: #fff; }
+.site-navbar { background: var(--brand-dark); }
+.hero-section {
+    background:
+      linear-gradient(90deg, rgba(4,35,43,.82), rgba(4,35,43,.20)),
+      url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1800&q=85') center/cover;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+}
+.min-vh-50 { min-height: 420px; }
+.eyebrow { letter-spacing: .16em; font-size: .75rem; font-weight: 700; }
+.property-card { border: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 28px rgba(15,45,55,.08); }
+.property-card img { height: 220px; object-fit: cover; }
+.placeholder-image {
+    height: 220px; display: grid; place-items: center;
+    background: var(--sand); color: var(--brand); font-weight: 800; letter-spacing: .2em;
+}
+.btn-primary { background: var(--brand); border-color: var(--brand); }
+.btn-primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); }

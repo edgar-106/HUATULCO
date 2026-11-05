@@ -1,0 +1,48 @@
+@model IEnumerable<Alojamiento>
+@{
+    ViewData["Title"] = "Descubre Huatulco";
+}
+<section class="hero-section">
+    <div class="container py-5">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-7 text-white">
+                <span class="eyebrow">ALOJAMIENTO Y EXPERIENCIAS</span>
+                <h1 class="display-3 fw-bold mt-3">Descubre Huatulco a tu manera.</h1>
+                <p class="lead">Encuentra tu alojamiento ideal y organiza experiencias para disfrutar cada momento.</p>
+                <a class="btn btn-light btn-lg mt-3" asp-controller="Alojamientos" asp-action="Index">Explorar alojamientos</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="container py-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <span class="eyebrow text-primary">ESTANCIAS SELECCIONADAS</span>
+            <h2 class="fw-bold">Nuestros alojamientos</h2>
+        </div>
+        <a asp-controller="Alojamientos" asp-action="Index" class="btn btn-outline-primary">Ver todos</a>
+    </div>
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 property-card">
+                    @if (!string.IsNullOrWhiteSpace(item.ImagenPrincipalUrl))
+                    {
+                        <img src="@item.ImagenPrincipalUrl" class="card-img-top" alt="@item.Nombre" />
+                    }
+                    else
+                    {
+                        <div class="placeholder-image">HUATULCO</div>
+                    }
+                    <div class="card-body">
+                        <span class="text-primary small">@item.Tipo</span>
+                        <h3 class="h5 mt-1">@item.Nombre</h3>
+                        <p class="text-muted">@item.CapacidadHuespedes huéspedes · @item.NumeroHabitaciones habitaciones</p>
+                        <strong>@item.PrecioBasePorNoche.ToString("C") / noche</strong>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+</section>

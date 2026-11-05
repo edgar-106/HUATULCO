@@ -1,0 +1,32 @@
+@model IEnumerable<Alojamiento>
+@{
+    ViewData["Title"] = "Alojamientos";
+}
+<section class="container py-5">
+    <span class="eyebrow text-primary">ENCUENTRA TU ESTANCIA</span>
+    <h1 class="fw-bold mb-4">Alojamientos en Huatulco</h1>
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 property-card">
+                    @if (!string.IsNullOrWhiteSpace(item.ImagenPrincipalUrl))
+                    {
+                        <img src="@item.ImagenPrincipalUrl" class="card-img-top" alt="@item.Nombre" />
+                    }
+                    else
+                    {
+                        <div class="placeholder-image">HUATULCO</div>
+                    }
+                    <div class="card-body">
+                        <span class="small text-primary">@item.Tipo</span>
+                        <h2 class="h5">@item.Nombre</h2>
+                        <p class="text-muted">@item.Descripcion</p>
+                        <p>@item.CapacidadHuespedes huéspedes · @item.NumeroHabitaciones habitaciones · @item.NumeroBanos baños</p>
+                        <strong>@item.PrecioBasePorNoche.ToString("C") por noche</strong>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+</section>
