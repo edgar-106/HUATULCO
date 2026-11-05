@@ -14,6 +14,7 @@ final class HomeController extends Controller
         $app['default_locale'] = $_SESSION['locale'] ?? $app['default_locale'];
         $this->view('home/index', [
             'accommodations' => (new Accommodation())->featured(),
+            'mapAccommodations' => (new Accommodation())->withCoordinates(),
             'app' => $app,
         ]);
     }

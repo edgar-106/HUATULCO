@@ -19,11 +19,17 @@ final class Accommodation
 
     private function allPublished(?int $limit = null): array
     {
-        $sql = 'SELECT id, name, accommodation_type, description, nightly_rate, capacity, cover_image, neighborhood FROM accommodations WHERE is_published = 1 ORDER BY is_featured DESC, name ASC';
+        $sql = 'SELECT id, name, accommodation_type, description, nightly_rate, capacity, cover_image, neighborhood, latitude, longitude FROM accommodations WHERE is_published = 1 ORDER BY is_featured DESC, name ASC';
         if ($limit !== null) {
             $sql .= ' LIMIT ' . (int) $limit;
         }
 
+        return Database::connection()->query($sql)->fetchAll();
+    }
+
+    public function withCoordinates(): array
+    {
+        $sql = 'SELECT id, name, accommodation_type, neighborhood, nightly_rate, latitude, longitude FROM accommodations WHERE is_published = 1 AND latitude IS NOT NULL AND longitude IS NOT NULL ORDER BY name';
         return Database::connection()->query($sql)->fetchAll();
     }
 }
