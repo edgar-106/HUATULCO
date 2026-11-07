@@ -1,92 +1,108 @@
-# HuatulcoTravel — base MVC
+# HuatulcoTravel — Plataforma de Hospedaje y Experiencias
 
-Proyecto inicial de plataforma de alojamientos y experiencias turísticas.
+Plataforma moderna de reservas, hospedaje y experiencias turísticas en Bahías de Huatulco, Oaxaca. Desarrollada en **ASP.NET Core MVC (.NET 10)** con **PostgreSQL** y **Entity Framework Core**.
 
-## Requisitos
+---
 
-- .NET 10 SDK
-- PostgreSQL 15 o superior
-- Visual Studio Code
-- Extensión C# Dev Kit (recomendada)
+## Características Principales
 
-## 1. Crear la base de datos
+- **Landing Satelital Interactiva**:
+  - Vista aérea con animación de aproximación desde el espacio hasta las bahías de Huatulco vía Leaflet y ArcGIS Esri World Imagery.
+  - Marcadores de ubicación con anillos dorados pulsantes y popups con detalles, fotos y precios en vivo.
+  - Contador dinámico de residencias ubicadas y controles de mapa.
+- **Catálogo de Alojamientos**:
+  - Exploración de casas, departamentos, habitaciones y villas con capacidad, recámaras y tarifas por noche.
+  - 8 alojamientos de muestra con coordenadas reales en Tangolunda, Chahué, Conejos, Santa Cruz, Bocana, Maguey y Arrocito.
+- **Sistema de Autenticación y Cuentas (ASP.NET Core Identity)**:
+  - Registro seguro de clientes (`/Cuenta/Registro`).
+  - Inicio de sesión (`/Cuenta/Ingresar`) con protección contra ataques de fuerza bruta y bloqueo temporal.
+  - Roles definidos: `Administrador`, `Cliente`, `Operativo`, `Proveedor`.
+- **Panel de Administración (`/Admin/Alojamientos`)**:
+  - CRUD completo para gestionar residencias.
+  - Subida múltiple de fotografías (`JPG`, `PNG`, `WEBP`) con validación de magic bytes (máximo 5 MB por archivo).
+  - Baja lógica (*soft delete*) para proteger el historial de reservas y pagos.
 
-Desde pgAdmin o psql, ejecutar:
+---
 
+## Requisitos Previos
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [PostgreSQL 15+](https://www.postgresql.org/download/) en ejecución local (puerto por defecto: `5432`).
+- [Git](https://git-scm.com/)
+
+---
+
+## Instrucciones para Ejecutar el Proyecto
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/edgar-106/HUATULCO.git
+cd HUATULCO
+```
+
+### 2. Configurar la Base de Datos
+Asegúrate de que el servicio de PostgreSQL esté activo. Crea la base de datos desde `psql` o `pgAdmin`:
 ```sql
 CREATE DATABASE huatulco_travel_db;
 ```
 
-## 2. Configurar la conexión
+Revisa tu cadena de conexión en `appsettings.json`. Si tu contraseña de PostgreSQL es diferente a `postgres`, cámbiala:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Port=5432;Database=huatulco_travel_db;Username=postgres;Password=TU_PASSWORD"
+}
+```
 
-Editar `appsettings.json` y cambiar `CAMBIAR_ESTA_PASSWORD` por la contraseña local de PostgreSQL.
-
-Para un entorno real, NO guardar contraseñas en `appsettings.json` ni subirlas a GitHub. Utilizar Secret Manager o variables de entorno.
-
-## 3. Instalar herramienta EF
-
+### 3. Aplicar las Migraciones y Sembrado de Datos
+Si no tienes la herramienta global de Entity Framework, instálala una sola vez:
 ```bash
 dotnet tool install --global dotnet-ef
 ```
 
-Si ya está instalada:
-
+Aplica las migraciones para generar las tablas en PostgreSQL:
 ```bash
-dotnet tool update --global dotnet-ef
-```
-
-## 4. Restaurar paquetes y crear tablas
-
-Desde la carpeta donde está `HuatulcoTravel.csproj`:
-
-```bash
-dotnet restore
-dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
-## 5. Ejecutar
-
+### 4. Iniciar la Aplicación
 ```bash
 dotnet run
 ```
 
-Abrir la dirección HTTPS que indique la terminal.
+La aplicación se iniciará y escuchará en:
+👉 **http://localhost:5000**
 
-## 6. Rutas iniciales
+---
 
-- Sitio público: `/`
-- Catálogo de alojamientos: `/Alojamientos`
-- Administración de alojamientos: `/Admin/Alojamientos`
+## Rutas y Acceso
 
-El área administrativa requiere iniciar sesión con un usuario que tenga el rol `Administrador`. La Etapa 2 incluye autenticación y creación segura del primer administrador mediante User Secrets; consulta las instrucciones de la sección Etapa 2.
+| Sección | Ruta | Descripción |
+| :--- | :--- | :--- |
+| **Inicio** | `/` | Landing con mapa satelital interactivo y estancias destacadas. |
+| **Catálogo** | `/Alojamientos` | Listado completo de alojamientos disponibles. |
+| **Ingreso** | `/Cuenta/Ingresar` | Formulario de inicio de sesión. |
+| **Registro** | `/Cuenta/Registro` | Alta de nuevos clientes. |
+| **Panel Admin** | `/Admin/Alojamientos` | Gestión administrativa de propiedades (requiere rol `Administrador`). |
 
-## Importante
+### Credenciales del Administrador por Defecto:
+- **Correo**: `admin@huatulcotravel.com`
+- **Contraseña**: `Admin1234#*`
 
-- XAMPP/Apache no ejecuta directamente ASP.NET Core MVC. Para desarrollo local se utiliza Kestrel con `dotnet run`.
-- No subir `appsettings.json` con credenciales reales a GitHub.
-- El CRUD de alojamientos es una base de desarrollo. Antes de producción se requiere auditoría, escaneo de archivos y pruebas.
-- La validación de disponibilidad y el flujo de pagos aún no están implementados; son los siguientes módulos.
+*(Para configurar un administrador personalizado antes del primer arranque, puedes usar `dotnet user-secrets set "BootstrapAdmin:Email" "tu@correo.com"` y `dotnet user-secrets set "BootstrapAdmin:Password" "TuClaveSegura!123"`).*
 
+---
 
-## Etapa 2: autenticación y administración
+## Arquitectura del Proyecto
 
-Incluye registro de clientes, inicio/cierre de sesión, bootstrap del primer administrador por User Secrets, baja lógica y carga múltiple de imágenes JPG/PNG/WEBP (máximo 5 MB por archivo).
-
-### Crear el primer administrador (solo una vez)
-Antes de iniciar la aplicación, configura: 
-```bash
-dotnet user-secrets set "BootstrapAdmin:Email" "admin@tudominio.com"
-dotnet user-secrets set "BootstrapAdmin:Password" "UnaClaveLarga!2026"
-dotnet user-secrets set "BootstrapAdmin:Name" "Administrador principal"
+```text
+HUATULCO/
+├── Areas/
+│   └── Admin/            # Panel administrativo (Controladores y vistas de gestión)
+├── Controllers/          # Controladores públicos (Home, Alojamientos, Cuenta)
+├── Data/                 # ApplicationDbContext, migraciones EF y SeedData
+├── Models/               # Entidades del dominio (Alojamiento, Reservacion, Pago, etc.)
+├── Services/             # Lógica de negocio (AlojamientoService)
+├── ViewModels/           # Modelos de vista para formularios (Login, Registro, etc.)
+├── Views/                # Plantillas Razor con diseño HuatulcoTravel
+└── wwwroot/              # Recursos estáticos (CSS, JS, uploads de imágenes)
 ```
-Inicia la aplicación una vez; el administrador se crea solo si todavía no existe uno. Después elimina esos secretos con `dotnet user-secrets remove "BootstrapAdmin:Email"` y lo mismo para Password y Name. No publiques credenciales en GitHub.
-
-### Migración si ya aplicaste InitialCreate
-```bash
-dotnet ef migrations add AddAlojamientoActivo
-dotnet ef database update
-```
-Si todavía no aplicaste migraciones, genera la migración inicial con el modelo actualizado.
-
-La carga guarda imágenes bajo `wwwroot/uploads/alojamientos`. Para producción se requiere revisión de seguridad, escaneo de archivos, almacenamiento dedicado, recuperación de contraseña, confirmación de correo, rate limiting y pruebas automatizadas.
