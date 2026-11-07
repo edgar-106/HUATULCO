@@ -3,52 +3,55 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HuatulcoTravel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>@ViewData["Title"] - HuatulcoTravel | Estancias &amp; Experiencias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-lg navbar-dark site-navbar">
-        <div class="container">
-            <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">HuatulcoTravel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Alojamientos" asp-action="Index">Alojamientos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Experiencias</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        @if (User.IsInRole("Administrador"))
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Alojamientos" asp-action="Index">Administración</a></li>
-                        }
-                        <li class="nav-item">
-                            <form asp-controller="Cuenta" asp-action="Salir" method="post">
-                                <button class="btn btn-link nav-link" type="submit">Cerrar sesión</button>
-                            </form>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item"><a class="nav-link" asp-controller="Cuenta" asp-action="Ingresar">Ingresar</a></li>
-<li class="nav-item"><a class="nav-link" asp-controller="Cuenta" asp-action="Registro">Crear cuenta</a></li>
-                    }
-                </ul>
-            </div>
-        </div>
+<header class="site-header">
+    <a class="brand" asp-controller="Home" asp-action="Index" aria-label="Huatulco, inicio">
+        <span class="brand-mark">H</span>
+        <span>HUATULCO<small>ESTANCIAS &amp; EXPERIENCIAS</small></span>
+    </a>
+    <nav aria-label="Navegación principal">
+        <a asp-controller="Home" asp-action="Index">Inicio</a>
+        <a asp-controller="Alojamientos" asp-action="Index">Alojamientos</a>
+        <a href="/#actividades">Experiencias</a>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            @if (User.IsInRole("Administrador"))
+            {
+                <a class="nav-admin-badge" asp-area="Admin" asp-controller="Alojamientos" asp-action="Index">Panel Admin</a>
+            }
+            <span class="nav-user-greeting">Hola, @(User.Identity.Name?.Split('@')[0] ?? "Usuario")</span>
+            <form asp-controller="Cuenta" asp-action="Salir" method="post" class="d-inline m-0 p-0">
+                @Html.AntiForgeryToken()
+                <button class="nav-logout-btn" type="submit">Cerrar sesión</button>
+            </form>
+        }
+        else
+        {
+            <a class="nav-login" asp-controller="Cuenta" asp-action="Ingresar">Ingresar</a>
+            <a class="nav-register" asp-controller="Cuenta" asp-action="Registro">Crear cuenta</a>
+        }
     </nav>
 </header>
+
 <main role="main">
     @RenderBody()
 </main>
-<footer class="border-top footer text-muted py-4 mt-5">
-    <div class="container">© @DateTime.Now.Year HuatulcoTravel. Todos los derechos reservados.</div>
+
+<footer class="site-footer">
+    <a class="brand" asp-controller="Home" asp-action="Index">
+        <span class="brand-mark" style="width:32px;height:32px;font-size:18px;">H</span>
+        <span>HUATULCO<small>ESTANCIAS &amp; EXPERIENCIAS</small></span>
+    </a>
+    <p>Bahías de Huatulco, Oaxaca · México</p>
+    <span>© @DateTime.Now.Year HuatulcoTravel. Todos los derechos reservados.</span>
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

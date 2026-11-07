@@ -2,31 +2,47 @@
 @{
     ViewData["Title"] = "Alojamientos";
 }
-<section class="container py-5">
-    <span class="eyebrow text-primary">ENCUENTRA TU ESTANCIA</span>
-    <h1 class="fw-bold mb-4">Alojamientos en Huatulco</h1>
-    <div class="row g-4">
-        @foreach (var item in Model)
+
+<section class="section-wrap">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">CATÁLOGO EXCLUSIVO</p>
+            <h2>Alojamientos en Bahías de Huatulco</h2>
+        </div>
+    </div>
+
+    <div class="stay-grid">
+        @if (!Model.Any())
         {
-            <div class="col-md-6 col-lg-4">
-                <article class="card h-100 property-card">
-                    @if (!string.IsNullOrWhiteSpace(item.ImagenPrincipalUrl))
-                    {
-                        <img src="@item.ImagenPrincipalUrl" class="card-img-top" alt="@item.Nombre" />
-                    }
-                    else
-                    {
-                        <div class="placeholder-image">HUATULCO</div>
-                    }
-                    <div class="card-body">
-                        <span class="small text-primary">@item.Tipo</span>
-                        <h2 class="h5">@item.Nombre</h2>
-                        <p class="text-muted">@item.Descripcion</p>
-                        <p>@item.CapacidadHuespedes huéspedes · @item.NumeroHabitaciones habitaciones · @item.NumeroBanos baños</p>
-                        <strong>@item.PrecioBasePorNoche.ToString("C") por noche</strong>
+            <article class="empty-card">
+                <span class="empty-icon">⌂</span>
+                <h3>Sin alojamientos publicados</h3>
+                <p>Actualmente no hay estancias activas para mostrar en el catálogo.</p>
+            </article>
+        }
+        else
+        {
+            @foreach (var stay in Model)
+            {
+                var bgStyle = !string.IsNullOrWhiteSpace(stay.ImagenPrincipalUrl)
+                    ? $"background-image: linear-gradient(180deg, transparent 55%, rgba(13,28,33,.6)), url('{stay.ImagenPrincipalUrl}');"
+                    : "background: linear-gradient(135deg, #18434c, #0a2127);";
+
+                <article class="stay-card">
+                    <div class="stay-image" style="@bgStyle">
+                        <span class="stay-tag">@stay.Tipo</span>
+                    </div>
+                    <div class="stay-info">
+                        <h3>@stay.Nombre</h3>
+                        <p class="mb-2">@stay.Descripcion</p>
+                        <p class="small text-muted mb-3">
+                            @(string.IsNullOrWhiteSpace(stay.Direccion) ? "Huatulco" : stay.Direccion) · 
+                            @stay.CapacidadHuespedes huéspedes · @stay.NumeroHabitaciones hab. · @stay.NumeroBanos baños
+                        </p>
+                        <strong>Desde @stay.PrecioBasePorNoche.ToString("C") <small>MXN / noche</small></strong>
                     </div>
                 </article>
-            </div>
+            }
         }
     </div>
 </section>

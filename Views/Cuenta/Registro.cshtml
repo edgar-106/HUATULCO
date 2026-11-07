@@ -1,4 +1,61 @@
 @model RegistroViewModel
-@{ViewData["Title"]="Crear cuenta";}
-<div class="container py-5" style="max-width:620px"><h1 class="h2 fw-bold">Crea tu cuenta</h1><p class="text-muted mb-4">Registra tus datos para gestionar tus reservaciones.</p><form asp-action="Registro" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div><div class="row g-3"><div class="col-md-6"><label asp-for="Nombre" class="form-label"></label><input asp-for="Nombre" class="form-control"/><span asp-validation-for="Nombre" class="text-danger"></span></div><div class="col-md-6"><label asp-for="Apellidos" class="form-label"></label><input asp-for="Apellidos" class="form-control"/></div><div class="col-12"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control"/><span asp-validation-for="Email" class="text-danger"></span></div><div class="col-12"><label asp-for="Telefono" class="form-label"></label><input asp-for="Telefono" class="form-control"/><span asp-validation-for="Telefono" class="text-danger"></span></div><div class="col-md-6"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control"/><span asp-validation-for="Password" class="text-danger"></span></div><div class="col-md-6"><label asp-for="ConfirmarPassword" class="form-label"></label><input asp-for="ConfirmarPassword" class="form-control"/><span asp-validation-for="ConfirmarPassword" class="text-danger"></span></div></div><button class="btn btn-primary w-100 mt-4" type="submit">Crear cuenta</button></form></div>
-@section Scripts{<partial name="_ValidationScriptsPartial"/>}
+@{
+    ViewData["Title"] = "Crear cuenta";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 560px;">
+        <span class="eyebrow">NUEVO CLIENTE</span>
+        <h1>Crea tu cuenta</h1>
+        <p class="subtitle">Registra tus datos para gestionar y reservar tus estancias en Huatulco.</p>
+
+        <form asp-action="Registro" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Nombre" class="form-label small fw-bold">Nombre</label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Tu nombre" />
+                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Apellidos" class="form-label small fw-bold">Apellidos</label>
+                    <input asp-for="Apellidos" class="form-control" placeholder="Tus apellidos" />
+                    <span asp-validation-for="Apellidos" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Email" class="form-label small fw-bold">Correo electrónico</label>
+                    <input asp-for="Email" class="form-control" autocomplete="username" placeholder="tu@correo.com" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Telefono" class="form-label small fw-bold">Teléfono de contacto</label>
+                    <input asp-for="Telefono" class="form-control" placeholder="+52 958 123 4567" />
+                    <span asp-validation-for="Telefono" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Password" class="form-label small fw-bold">Contraseña</label>
+                    <input asp-for="Password" class="form-control" autocomplete="new-password" placeholder="Mínimo 10 caracteres" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ConfirmarPassword" class="form-label small fw-bold">Confirmar contraseña</label>
+                    <input asp-for="ConfirmarPassword" class="form-control" autocomplete="new-password" placeholder="Repite tu contraseña" />
+                    <span asp-validation-for="ConfirmarPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button class="btn-submit mt-4" type="submit">Completar registro</button>
+        </form>
+
+        <div class="text-center mt-4 pt-3 border-top">
+            <span class="text-muted small">¿Ya tienes cuenta?</span>
+            <a asp-action="Ingresar" class="fw-bold ms-1" style="color: var(--sea); text-decoration: none;">Iniciar sesión</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
