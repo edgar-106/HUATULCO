@@ -15,7 +15,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         var propiedades = await _alojamientos.ObtenerTodosAsync(soloPublicados: true);
-        return View(propiedades.Take(6));
+        return View(propiedades);
     }
 
     public IActionResult Privacy() => View();

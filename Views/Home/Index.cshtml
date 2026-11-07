@@ -96,7 +96,7 @@
         }
         else
         {
-            @foreach (var stay in Model)
+            @foreach (var stay in Model.Take(6))
             {
                 var bgStyle = !string.IsNullOrWhiteSpace(stay.ImagenPrincipalUrl)
                     ? $"background-image: linear-gradient(180deg, transparent 55%, rgba(13,28,33,.6)), url('{stay.ImagenPrincipalUrl}');"
