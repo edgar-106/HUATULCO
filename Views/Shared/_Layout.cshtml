@@ -17,43 +17,104 @@
             <span>HUATULCO<small>ESTANCIAS &amp; EXPERIENCIAS</small></span>
         </a>
 
-        <!-- Botón Menú Hamburguesa para Celular -->
-        <button class="mobile-menu-toggle d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenuContent" aria-controls="navMenuContent" aria-expanded="false" aria-label="Abrir menú de navegación">
+        <!-- Navegación para Pantallas Grandes (Desktop) -->
+        <nav class="d-none d-lg-flex align-items-center gap-3" aria-label="Navegación principal">
+            <a asp-controller="Home" asp-action="Index" class="nav-item-link">Inicio</a>
+            <a asp-controller="Alojamientos" asp-action="Index" class="nav-item-link">Alojamientos</a>
+            <a href="/#actividades" class="nav-item-link">Experiencias</a>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                @if (User.IsInRole("Administrador"))
+                {
+                    <a class="nav-admin-badge" asp-area="Admin" asp-controller="Alojamientos" asp-action="Index">Panel Admin</a>
+                }
+                <span class="nav-user-greeting">Hola, @(User.Identity.Name?.Split('@')[0] ?? "Usuario")</span>
+                <form asp-controller="Cuenta" asp-action="Salir" method="post" class="d-inline m-0 p-0">
+                    @Html.AntiForgeryToken()
+                    <button class="nav-logout-btn" type="submit">Cerrar sesión</button>
+                </form>
+            }
+            else
+            {
+                <a class="nav-login" asp-controller="Cuenta" asp-action="Ingresar">Ingresar</a>
+                <a class="nav-register" asp-controller="Cuenta" asp-action="Registro">Crear cuenta</a>
+            }
+        </nav>
+
+        <!-- Botón Menú Hamburguesa para Móvil -->
+        <button class="mobile-menu-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuMovilLateral" aria-controls="menuMovilLateral" aria-label="Abrir menú de navegación">
             <span class="menu-bar"></span>
             <span class="menu-bar"></span>
             <span class="menu-bar"></span>
         </button>
-
-        <!-- Contenedor de Navegación (Horizontal en PC, Menú Desplegable en Móvil) -->
-        <div class="collapse d-lg-flex flex-lg-row align-items-lg-center" id="navMenuContent">
-            <nav class="nav-links-wrap" aria-label="Navegación principal">
-                <a asp-controller="Home" asp-action="Index">Inicio</a>
-                <a asp-controller="Alojamientos" asp-action="Index">Alojamientos</a>
-                <a href="/#actividades">Experiencias</a>
-                
-                <div class="nav-divider d-lg-none"></div>
-
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    @if (User.IsInRole("Administrador"))
-                    {
-                        <a class="nav-admin-badge" asp-area="Admin" asp-controller="Alojamientos" asp-action="Index">Panel Admin</a>
-                    }
-                    <span class="nav-user-greeting">Hola, @(User.Identity.Name?.Split('@')[0] ?? "Usuario")</span>
-                    <form asp-controller="Cuenta" asp-action="Salir" method="post" class="d-inline m-0 p-0">
-                        @Html.AntiForgeryToken()
-                        <button class="nav-logout-btn" type="submit">Cerrar sesión</button>
-                    </form>
-                }
-                else
-                {
-                    <a class="nav-login" asp-controller="Cuenta" asp-action="Ingresar">Ingresar</a>
-                    <a class="nav-register" asp-controller="Cuenta" asp-action="Registro">Crear cuenta</a>
-                }
-            </nav>
-        </div>
     </div>
 </header>
+
+<!-- Menú Lateral Móvil (Offcanvas Profesional) -->
+<div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="menuMovilLateral" aria-labelledby="menuMovilLateralLabel" style="width: 310px; max-width: 85vw; background: #fff;">
+    <div class="offcanvas-header border-bottom px-4 py-3">
+        <a class="brand" asp-controller="Home" asp-action="Index">
+            <span class="brand-mark" style="width:34px;height:34px;font-size:20px;">H</span>
+            <span>HUATULCO<small>ESTANCIAS &amp; EXPERIENCIAS</small></span>
+        </a>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Cerrar menú"></button>
+    </div>
+    
+    <div class="offcanvas-body d-flex flex-column justify-content-between p-4">
+        <!-- Enlaces principales del menú -->
+        <div class="d-flex flex-column gap-2">
+            <span class="eyebrow mb-1" style="font-size: 10px;">NAVEGACIÓN</span>
+            <a class="mobile-nav-link" asp-controller="Home" asp-action="Index">
+                <span>🏠</span> Inicio
+            </a>
+            <a class="mobile-nav-link" asp-controller="Alojamientos" asp-action="Index">
+                <span>🏝️</span> Alojamientos
+            </a>
+            <a class="mobile-nav-link" href="/#actividades">
+                <span>🌊</span> Experiencias
+            </a>
+
+            @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Administrador"))
+            {
+                <a class="mobile-nav-link" asp-area="Admin" asp-controller="Alojamientos" asp-action="Index" style="background: #eef5f5; color: var(--sea); font-weight: 700;">
+                    <span>⚙️</span> Panel Administrativo
+                </a>
+            }
+        </div>
+
+        <!-- Zona de Usuario / Acceso en la parte inferior del menú -->
+        <div class="pt-4 border-top mt-auto">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="p-3 rounded-3 bg-light border mb-3">
+                    <span class="text-muted small d-block">Sesión activa:</span>
+                    <strong class="d-block text-dark">@(User.Identity.Name ?? "Usuario")</strong>
+                </div>
+                <form asp-controller="Cuenta" asp-action="Salir" method="post" class="m-0 p-0">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-outline-danger w-100 rounded-pill py-2 fw-bold" type="submit">
+                        Cerrar sesión
+                    </button>
+                </form>
+            }
+            else
+            {
+                <div class="d-grid gap-2">
+                    <a class="btn btn-outline-dark rounded-pill py-2 fw-semibold" asp-controller="Cuenta" asp-action="Ingresar">
+                        Ingresar
+                    </a>
+                    <a class="button button-gold text-center py-2 fw-bold" asp-controller="Cuenta" asp-action="Registro" style="border-radius: 50px;">
+                        Crear cuenta <span>↗</span>
+                    </a>
+                </div>
+            }
+            <div class="text-center mt-3 text-muted small" style="font-size: 11px;">
+                Bahías de Huatulco, Oaxaca · México
+            </div>
+        </div>
+    </div>
+</div>
 
 <main role="main">
     @RenderBody()

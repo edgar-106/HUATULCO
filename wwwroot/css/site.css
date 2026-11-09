@@ -932,6 +932,28 @@ footer.site-footer > span {
 /* ==========================================================================
    RESPONSIVE DESIGN & MOBILE OPTIMIZATION
    ========================================================================== */
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    background: #fbfbf9;
+    border: 1px solid #eeefeb;
+    transition: all .2s;
+}
+.mobile-nav-link:hover,
+.mobile-nav-link:active {
+    background: #eef5f5;
+    color: var(--sea);
+    border-color: #cde1e3;
+    transform: translateX(3px);
+}
+
 @media (max-width: 991px) {
     .site-header {
         height: auto;
@@ -942,56 +964,6 @@ footer.site-footer > span {
     }
     .mobile-menu-toggle {
         display: flex;
-    }
-    #navMenuContent.collapse:not(.show) {
-        display: none !important;
-    }
-    #navMenuContent.collapsing,
-    #navMenuContent.collapse.show {
-        display: block !important;
-        background: #fff;
-        border-top: 1px solid var(--line);
-        padding: 16px 20px 24px;
-        box-shadow: 0 16px 30px rgba(16, 39, 44, .1);
-    }
-    .nav-links-wrap {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    .nav-links-wrap > a {
-        padding: 10px 14px;
-        border-radius: 12px;
-        font-size: 14px;
-        display: block;
-        background: rgba(16, 39, 44, .03);
-    }
-    .nav-links-wrap > a:hover {
-        background: #eef5f5;
-        color: var(--sea);
-    }
-    .nav-divider {
-        height: 1px;
-        background: var(--line);
-        margin: 6px 0;
-    }
-    .nav-links-wrap .nav-login,
-    .nav-links-wrap .nav-register {
-        text-align: center;
-        padding: 12px 20px;
-        font-size: 14px;
-        display: block;
-        width: 100%;
-    }
-    .nav-user-greeting {
-        text-align: center;
-        padding: 8px 0;
-        font-weight: 600;
-    }
-    .nav-logout-btn {
-        width: 100%;
-        padding: 12px 20px;
-        text-align: center;
     }
     .sticky-top {
         position: static !important;
