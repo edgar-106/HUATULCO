@@ -36,36 +36,27 @@
         </a>
     </div>
 
-    <!-- Título y Encabezado con Tarifa -->
-    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="stay-tag position-static d-inline-block">@Model.Tipo</span>
-                <span class="text-muted small">· Bahías de Huatulco, Oaxaca</span>
-            </div>
-            <h1 class="display-5 fw-bold" style="font-family: 'Playfair Display', serif; color: var(--deep);">@Model.Nombre</h1>
-            <p class="text-muted mb-0">
-                📍 @(string.IsNullOrWhiteSpace(Model.Direccion) ? "Bahías de Huatulco, Oaxaca, México" : Model.Direccion)
-            </p>
+    <!-- Título y Encabezado -->
+    <div class="mb-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="stay-tag position-static d-inline-block">@Model.Tipo</span>
+            <span class="text-muted small">· Bahías de Huatulco, Oaxaca</span>
         </div>
-        <div class="text-md-end">
-            <span class="d-block text-muted small text-uppercase fw-bold">Tarifa por noche</span>
-            <div class="d-flex align-items-baseline gap-2">
-                <span class="fs-2 fw-bold" style="color: #ae8c4c;">@Model.PrecioBasePorNoche.ToString("C")</span>
-                <span class="text-muted small">MXN por noche</span>
-            </div>
-        </div>
+        <h1 class="display-5 fw-bold" style="font-family: 'Playfair Display', serif; color: var(--deep); font-size: clamp(28px, 4.5vw, 44px);">@Model.Nombre</h1>
+        <p class="text-muted mb-0 small">
+            📍 @(string.IsNullOrWhiteSpace(Model.Direccion) ? "Bahías de Huatulco, Oaxaca, México" : Model.Direccion)
+        </p>
     </div>
 
-    <!-- Galería / Imagen Principal Expandida a Pantalla Completa -->
+    <!-- Galería / Imagen Principal Expandida y Responsiva -->
     <div class="mb-5 position-relative">
-        <div class="rounded-4 overflow-hidden shadow position-relative" style="height: 520px; background-color: #c5d2ce; background-position: center; background-size: cover; background-image: url('@(string.IsNullOrWhiteSpace(Model.ImagenPrincipalUrl) ? "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80" : Model.ImagenPrincipalUrl)');">
+        <div class="rounded-4 overflow-hidden shadow position-relative hero-stay-banner" style="height: clamp(300px, 46vh, 520px); background-color: #c5d2ce; background-position: center; background-size: cover; background-image: url('@(string.IsNullOrWhiteSpace(Model.ImagenPrincipalUrl) ? "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80" : Model.ImagenPrincipalUrl)');">
             <!-- Botones de Acción Prominentes sobre la Imagen -->
-            <div class="position-absolute bottom-0 start-0 m-4 d-flex flex-wrap gap-3" style="z-index: 10;">
-                <button type="button" class="btn btn-dark rounded-pill px-4 py-2 shadow-lg d-flex align-items-center gap-2" style="background: rgba(9,23,27,.88); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.3); font-size: 14px; font-weight: 600; color: #fff;" onclick="abrirGaleriaFotosModal('@Model.Nombre', @Html.Raw(jsonFotosModel))">
+            <div class="position-absolute bottom-0 start-0 m-3 m-sm-4 d-flex flex-wrap gap-2 gap-sm-3" style="z-index: 10;">
+                <button type="button" class="btn btn-dark rounded-pill px-3 px-sm-4 py-2 shadow-lg d-flex align-items-center gap-2" style="background: rgba(9,23,27,.88); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.3); font-size: clamp(12px, 3.2vw, 14px); font-weight: 600; color: #fff;" onclick="abrirGaleriaFotosModal('@Model.Nombre', @Html.Raw(jsonFotosModel))">
                     📷 Ver Fotos (@listaFotos.Count)
                 </button>
-                <button type="button" class="btn rounded-pill px-4 py-2 shadow-lg d-flex align-items-center gap-2 text-dark" style="background: #e4c27a; font-size: 14px; font-weight: 700; border: none;" onclick="abrirTour3DModal('@Model.Nombre', '@Model.Tipo')">
+                <button type="button" class="btn rounded-pill px-3 px-sm-4 py-2 shadow-lg d-flex align-items-center gap-2 text-dark" style="background: #e4c27a; font-size: clamp(12px, 3.2vw, 14px); font-weight: 700; border: none;" onclick="abrirTour3DModal('@Model.Nombre', '@Model.Tipo')">
                     🌐 Recorrido 3D Interactivo
                 </button>
             </div>
@@ -202,8 +193,8 @@
                 </div>
             </div>
 
-            <!-- Contenedor del Mapa en Grande -->
-            <div id="detail-map" class="rounded-4 overflow-hidden border shadow" style="height: 540px; width: 100%;"></div>
+            <!-- Contenedor del Mapa en Grande y Responsivo -->
+            <div id="detail-map" class="rounded-4 overflow-hidden border shadow" style="height: clamp(350px, 52vh, 540px); width: 100%;"></div>
         </div>
     }
 </div>
@@ -222,7 +213,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="position-relative rounded-4 overflow-hidden mb-3 bg-black d-flex align-items-center justify-content-center" style="height: 440px;">
+                <div class="position-relative rounded-4 overflow-hidden mb-3 bg-black d-flex align-items-center justify-content-center" style="height: clamp(260px, 45vh, 440px);">
                     <img id="imgGaleriaPrincipal" src="" alt="Fotografía" class="w-100 h-100 object-fit-cover" />
                     
                     <button type="button" class="btn-tour-ctrl position-absolute start-0 ms-3 top-50 translate-middle-y" onclick="anteriorFoto()" aria-label="Foto anterior">
@@ -259,9 +250,9 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             
-            <div class="modal-body p-4">
+            <div class="modal-body p-3 p-sm-4">
                 <div class="tour-3d-box">
-                    <div id="tour3d-canvas-container" class="tour-3d-canvas-wrap" style="height: 520px;">
+                    <div id="tour3d-canvas-container" class="tour-3d-canvas-wrap" style="height: clamp(320px, 60vh, 520px);">
                     </div>
                     
                     <div class="tour-3d-overlay-top">
