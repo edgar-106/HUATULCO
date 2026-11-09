@@ -72,9 +72,10 @@
         </div>
     </div>
 
-    <!-- Contenido Principal en Toda la Pantalla (Sin Columna Lateral) -->
-    <div class="row">
-        <div class="col-12">
+    <!-- Fila de Detalles y Tarjeta de Reservación -->
+    <div class="row g-5 mb-5">
+        <!-- Columna Izquierda: Características, Descripción y Servicios -->
+        <div class="col-lg-8">
             <!-- Barra de Características Principales -->
             <div class="p-4 rounded-4 bg-white border mb-4 d-flex flex-wrap justify-content-around gap-3 text-center shadow-sm">
                 <div>
@@ -107,7 +108,7 @@
             </div>
 
             <!-- Servicios Incluidos -->
-            <div class="mb-5 p-4 rounded-4 bg-white border shadow-sm">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
                 <h3 class="h4 fw-bold mb-3" style="font-family: 'Playfair Display', serif; color: var(--deep);">Lo que ofrece este lugar</h3>
                 <div class="row g-3 text-secondary">
                     <div class="col-sm-6">✓ Vista al mar o entorno natural</div>
@@ -118,51 +119,93 @@
                     <div class="col-sm-6">✓ Estacionamiento seguro incluido</div>
                 </div>
             </div>
+        </div>
 
-            <!-- Mapa de Ubicación EN GRANDE con Navegación GPS -->
-            @if (hasCoords)
-            {
-                <div class="mb-5">
-                    <div class="p-4 rounded-4 bg-white border shadow-sm mb-3">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                            <div>
-                                <span class="stay-tag position-static d-inline-block mb-1">MAPA INTERACTIVO</span>
-                                <h3 class="h3 fw-bold mb-1" style="font-family: 'Playfair Display', serif; color: var(--deep);">Ubicación en Bahías de Huatulco</h3>
-                                <p class="text-muted small mb-0">
-                                    📍 @(string.IsNullOrWhiteSpace(Model.Direccion) ? "Bahías de Huatulco, Oaxaca" : Model.Direccion) · Coordenadas: @Model.Latitud, @Model.Longitud
-                                </p>
-                            </div>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button id="btnGpsRuta" type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold d-flex align-items-center gap-2 shadow-sm" style="background: var(--sea); border-color: var(--sea);" onclick="iniciarCaminoDesdeUbicacion()">
-                                    <span>📍</span> Iniciar camino desde mi ubicación
-                                </button>
-                                <a id="btnNavDirecto" href="https://www.google.com/maps/dir/?api=1&destination=@Model.Latitud,@Model.Longitud" target="_blank" class="btn btn-outline-dark rounded-pill px-4 py-2 small fw-semibold d-flex align-items-center gap-2">
-                                    🗺️ Abrir en Google Maps ↗
-                                </a>
-                            </div>
+        <!-- Columna Derecha: Tarjeta de Reservación -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 105px;">
+                <div class="auth-card p-4 shadow-sm" style="max-width: 100%;">
+                    <div class="d-flex justify-content-between align-items-baseline mb-3">
+                        <span class="fs-3 fw-bold text-dark" style="color: #ae8c4c !important;">
+                            @Model.PrecioBasePorNoche.ToString("C")
+                        </span>
+                        <span class="text-muted small">MXN por noche</span>
+                    </div>
+
+                    <div class="p-3 rounded-3 bg-light border mb-3 small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Alojamiento:</span>
+                            <strong>@Model.Tipo</strong>
                         </div>
-
-                        <!-- Panel de Información de Ruta Calculada -->
-                        <div id="panelInfoCamino" class="mt-3 p-3 rounded-3 border d-none align-items-center justify-content-between gap-3" style="background: #eef7f8; border-color: #b9e0e5 !important;">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="fs-3">🚗</div>
-                                <div>
-                                    <strong id="textoDistanciaCamino" class="d-block" style="color: var(--deep);">Calculando tu ruta...</strong>
-                                    <small id="textoDetalleCamino" class="text-muted">Ruta directa trazada hacia @Model.Nombre</small>
-                                </div>
-                            </div>
-                            <a id="btnIniciarGpsEnVivo" href="#" target="_blank" class="btn btn-sm btn-dark rounded-pill px-3 py-2 fw-bold text-nowrap">
-                                Navegación GPS en tiempo real ↗
-                            </a>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Capacidad máx:</span>
+                            <strong>Hasta @Model.CapacidadHuespedes personas</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Disponibilidad:</span>
+                            <span class="badge bg-success-subtle text-success">Disponible</span>
                         </div>
                     </div>
 
-                    <!-- Contenedor del Mapa en Grande -->
-                    <div id="detail-map" class="rounded-4 overflow-hidden border shadow" style="height: 540px; width: 100%;"></div>
+                    <div class="d-grid gap-2 mb-3">
+                        <a href="https://wa.me/?text=@Uri.EscapeDataString($"Hola, deseo información y reservar en {Model.Nombre} en Bahías de Huatulco.")" target="_blank" class="button button-gold w-100 text-center">
+                            Solicitar Reservación <span>↗</span>
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="button button-outline text-center text-dark" style="border-color: #ced2cd; color: var(--ink) !important;">
+                            Explorar experiencias
+                        </a>
+                    </div>
+
+                    <p class="text-muted small text-center mb-0" style="font-size: 11px;">
+                        🔒 Apartado protegido durante 3 días. Sin cargos sorpresa.
+                    </p>
                 </div>
-            }
+            </div>
         </div>
     </div>
+
+    <!-- Mapa de Ubicación EN GRANDE (A todo lo ancho, sin columna lateral) -->
+    @if (hasCoords)
+    {
+        <div class="mb-5">
+            <div class="p-4 rounded-4 bg-white border shadow-sm mb-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        <span class="stay-tag position-static d-inline-block mb-1">MAPA INTERACTIVO</span>
+                        <h3 class="h3 fw-bold mb-1" style="font-family: 'Playfair Display', serif; color: var(--deep);">Ubicación en Bahías de Huatulco</h3>
+                        <p class="text-muted small mb-0">
+                            📍 @(string.IsNullOrWhiteSpace(Model.Direccion) ? "Bahías de Huatulco, Oaxaca" : Model.Direccion) · Coordenadas: @Model.Latitud, @Model.Longitud
+                        </p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button id="btnGpsRuta" type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold d-flex align-items-center gap-2 shadow-sm" style="background: var(--sea); border-color: var(--sea);" onclick="iniciarCaminoDesdeUbicacion()">
+                            <span>📍</span> Iniciar camino desde mi ubicación
+                        </button>
+                        <a id="btnNavDirecto" href="https://www.google.com/maps/dir/?api=1&destination=@Model.Latitud,@Model.Longitud" target="_blank" class="btn btn-outline-dark rounded-pill px-4 py-2 small fw-semibold d-flex align-items-center gap-2">
+                            🗺️ Abrir en Google Maps ↗
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Panel de Información de Ruta Calculada -->
+                <div id="panelInfoCamino" class="mt-3 p-3 rounded-3 border d-none align-items-center justify-content-between gap-3" style="background: #eef7f8; border-color: #b9e0e5 !important;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fs-3">🚗</div>
+                        <div>
+                            <strong id="textoDistanciaCamino" class="d-block" style="color: var(--deep);">Calculando tu ruta...</strong>
+                            <small id="textoDetalleCamino" class="text-muted">Ruta directa trazada hacia @Model.Nombre</small>
+                        </div>
+                    </div>
+                    <a id="btnIniciarGpsEnVivo" href="#" target="_blank" class="btn btn-sm btn-dark rounded-pill px-3 py-2 fw-bold text-nowrap">
+                        Navegación GPS en tiempo real ↗
+                    </a>
+                </div>
+            </div>
+
+            <!-- Contenedor del Mapa en Grande -->
+            <div id="detail-map" class="rounded-4 overflow-hidden border shadow" style="height: 540px; width: 100%;"></div>
+        </div>
+    }
 </div>
 
 <!-- ==========================================================================
