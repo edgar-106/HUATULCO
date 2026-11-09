@@ -108,11 +108,11 @@
                     </div>
                     <div class="stay-info">
                         <h3>@stay.Nombre</h3>
-                        <p class="mb-3">
+                        <p class="stay-specs">
                             @(string.IsNullOrWhiteSpace(stay.Direccion) ? "Bahías de Huatulco" : stay.Direccion) · @stay.CapacidadHuespedes huéspedes · @stay.NumeroHabitaciones hab. · @stay.NumeroBanos baños
                         </p>
-                        <div class="d-flex justify-content-between align-items-baseline mt-auto">
-                            <strong>Desde @stay.PrecioBasePorNoche.ToString("C") <small>MXN / noche</small></strong>
+                        <div class="stay-footer">
+                            <strong>Desde @stay.PrecioBasePorNoche.ToString("C") <small>MXN por noche</small></strong>
                             <span class="text-link small" style="color: var(--sea); font-weight: 700;">Ver detalles ↗</span>
                         </div>
                     </div>

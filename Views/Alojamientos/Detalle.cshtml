@@ -2,6 +2,23 @@
 @{
     ViewData["Title"] = Model.Nombre;
     var hasCoords = Model.Latitud.HasValue && Model.Longitud.HasValue;
+
+    var listaFotos = new List<string>();
+    if (!string.IsNullOrWhiteSpace(Model.ImagenPrincipalUrl))
+    {
+        listaFotos.Add(Model.ImagenPrincipalUrl);
+    }
+    if (Model.Imagenes != null)
+    {
+        foreach (var img in Model.Imagenes)
+        {
+            if (!string.IsNullOrWhiteSpace(img.RutaArchivo) && !listaFotos.Contains(img.RutaArchivo))
+            {
+                listaFotos.Add(img.RutaArchivo);
+            }
+        }
+    }
+    var jsonFotosModel = System.Text.Json.JsonSerializer.Serialize(listaFotos);
 }
 
 <div class="section-wrap" style="padding-top: 40px;">
@@ -33,17 +50,25 @@
 
     <!-- Galería / Imagen Principal -->
     <div class="row g-3 mb-5">
-        <div class="@(Model.Imagenes.Any() ? "col-lg-8" : "col-12")">
-            <div class="rounded-4 overflow-hidden shadow-sm" style="height: 460px; background-color: #c5d2ce; background-position: center; background-size: cover; background-image: url('@(string.IsNullOrWhiteSpace(Model.ImagenPrincipalUrl) ? "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80" : Model.ImagenPrincipalUrl)');">
+        <div class="@(Model.Imagenes != null && Model.Imagenes.Any() ? "col-lg-8" : "col-12") position-relative">
+            <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 460px; background-color: #c5d2ce; background-position: center; background-size: cover; background-image: url('@(string.IsNullOrWhiteSpace(Model.ImagenPrincipalUrl) ? "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80" : Model.ImagenPrincipalUrl)');">
+                <div class="position-absolute bottom-0 start-0 m-3 d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-dark rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2" style="background: rgba(9,23,27,.82); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.2); font-size: 13px; font-weight: 600;" onclick="abrirGaleriaFotosModal('@Model.Nombre', @Html.Raw(jsonFotosModel))">
+                        📷 Ver Fotos (@listaFotos.Count)
+                    </button>
+                    <button type="button" class="btn btn-sm rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2 text-dark" style="background: var(--sand); font-size: 13px; font-weight: 700; border: none;" onclick="abrirTour3DModal('@Model.Nombre', '@Model.Tipo')">
+                        🌐 Recorrido 3D Interactivo
+                    </button>
+                </div>
             </div>
         </div>
-        @if (Model.Imagenes.Any())
+        @if (Model.Imagenes != null && Model.Imagenes.Any())
         {
             <div class="col-lg-4">
                 <div class="d-flex flex-column gap-3 h-100">
                     @foreach (var img in Model.Imagenes.Take(2))
                     {
-                        <div class="rounded-4 overflow-hidden shadow-sm flex-fill" style="min-height: 215px; background-color: #c5d2ce; background-position: center; background-size: cover; background-image: url('@img.RutaArchivo');"></div>
+                        <div class="rounded-4 overflow-hidden shadow-sm flex-fill" style="min-height: 215px; background-color: #c5d2ce; background-position: center; background-size: cover; background-image: url('@img.RutaArchivo'); cursor: pointer;" onclick="abrirGaleriaFotosModal('@Model.Nombre', @Html.Raw(jsonFotosModel))"></div>
                     }
                 </div>
             </div>
@@ -117,7 +142,7 @@
                         <span class="fs-3 fw-bold text-dark" style="color: #ae8c4c !important;">
                             @Model.PrecioBasePorNoche.ToString("C")
                         </span>
-                        <span class="text-muted small">MXN / noche</span>
+                        <span class="text-muted small">MXN por noche</span>
                     </div>
 
                     <div class="p-3 rounded-3 bg-light border mb-3 small">
@@ -153,36 +178,330 @@
     </div>
 </div>
 
-@if (hasCoords)
-{
-    @section Scripts {
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- ==========================================================================
+     MODAL DE GALERÍA DE IMÁGENES
+     ========================================================================== -->
+<div class="modal fade" id="modalGaleriaFotos" tabindex="-1" aria-labelledby="modalGaleriaFotosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 overflow-hidden shadow-lg" style="background: #10272c; color: #fff;">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <div>
+                    <span class="eyebrow" style="color: var(--sand);">GALERÍA FOTOGRÁFICA</span>
+                    <h5 class="modal-title h4 fw-bold" id="modalGaleriaTitulo" style="font-family: 'Playfair Display', serif;">@Model.Nombre</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="position-relative rounded-4 overflow-hidden mb-3 bg-black d-flex align-items-center justify-content-center" style="height: 440px;">
+                    <img id="imgGaleriaPrincipal" src="" alt="Fotografía" class="w-100 h-100 object-fit-cover" />
+                    
+                    <button type="button" class="btn-tour-ctrl position-absolute start-0 ms-3 top-50 translate-middle-y" onclick="anteriorFoto()" aria-label="Foto anterior">
+                        ❮
+                    </button>
+                    <button type="button" class="btn-tour-ctrl position-absolute end-0 me-3 top-50 translate-middle-y" onclick="siguienteFoto()" aria-label="Siguiente foto">
+                        ❯
+                    </button>
+                    
+                    <span id="contadorFotos" class="position-absolute bottom-0 start-50 translate-middle-x mb-3 px-3 py-1 rounded-pill small" style="background: rgba(0,0,0,.65); backdrop-filter: blur(6px); font-size: 11px;">
+                        1 / 1
+                    </span>
+                </div>
+                
+                <div id="tiraMiniaturas" class="d-flex gap-2 overflow-auto pb-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     MODAL DE RECORRIDO INTERACTIVO 3D (360° WebGL Three.js)
+     ========================================================================== -->
+<div class="modal fade" id="modalTour3D" tabindex="-1" aria-labelledby="modalTour3DLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content rounded-4 border-0 overflow-hidden shadow-lg" style="background: #09171b; color: #fff;">
+            <div class="modal-header border-0 pb-0 px-4 pt-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="tour-badge-3d">
+                        <span class="pulse-3d"></span> 360° INTERACTIVO
+                    </span>
+                    <h5 class="modal-title h4 fw-bold mb-0" id="modalTourTitulo" style="font-family: 'Playfair Display', serif;">@Model.Nombre</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <div class="tour-3d-box">
+                    <div id="tour3d-canvas-container" class="tour-3d-canvas-wrap" style="height: 520px;">
+                    </div>
+                    
+                    <div class="tour-3d-overlay-top">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="tour-tip-pill">
+                                🖱️ Arrastra para girar 360° · Rueda para hacer zoom
+                            </span>
+                        </div>
+                        <button type="button" id="btnToggleGiro" class="btn-tour-ctrl" onclick="toggleAutoGiro()" title="Pausar / Reanudar giro automático">
+                            🔄
+                        </button>
+                    </div>
+
+                    <div class="tour-3d-overlay-bottom">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn-tour-room active" onclick="cambiarAmbiente3D(0, this)">
+                                🛋️ Sala & Terraza
+                            </button>
+                            <button type="button" class="btn-tour-room" onclick="cambiarAmbiente3D(1, this)">
+                                🛏️ Recámara Master
+                            </button>
+                            <button type="button" class="btn-tour-room" onclick="cambiarAmbiente3D(2, this)">
+                                🌊 Alberca & Vista al Mar
+                            </button>
+                        </div>
+                        <div class="d-flex gap-1 ms-auto">
+                            <button type="button" class="btn-tour-ctrl" onclick="zoomTour(1)" title="Acercar">＋</button>
+                            <button type="button" class="btn-tour-ctrl" onclick="zoomTour(-1)" title="Alejar">－</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    @if (hasCoords)
+    {
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <script>
+        (() => {
+            const lat = @Model.Latitud!.Value;
+            const lng = @Model.Longitud!.Value;
+            
+            const map = L.map('detail-map', {
+                zoomControl: true,
+                scrollWheelZoom: false
+            }).setView([lat, lng], 15);
+
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri — Source: Esri, Maxar'
+            }).addTo(map);
+
+            const icon = L.divIcon({
+                className: 'residence-marker-wrap',
+                html: '<span class="residence-marker"><i></i></span>',
+                iconSize: [34, 42],
+                iconAnchor: [17, 38],
+                popupAnchor: [0, -36]
+            });
+
+            const marker = L.marker([lat, lng], { icon }).addTo(map);
+            marker.bindPopup(`<strong>@Model.Nombre</strong><br><small>@Model.Direccion</small>`).openPopup();
+        })();
+        </script>
+    }
     <script>
-    (() => {
-        const lat = @Model.Latitud!.Value;
-        const lng = @Model.Longitud!.Value;
+    // ==========================================================================
+    // GALERÍA DE FOTOS INTERACTIVA
+    // ==========================================================================
+    let fotosActuales = [];
+    let fotoIndiceActual = 0;
+
+    function abrirGaleriaFotosModal(nombre, listaFotos) {
+        document.getElementById('modalGaleriaTitulo').textContent = `${nombre}`;
+        fotosActuales = (listaFotos && listaFotos.length > 0) ? listaFotos : ['https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80'];
+        fotoIndiceActual = 0;
         
-        const map = L.map('detail-map', {
-            zoomControl: true,
-            scrollWheelZoom: false
-        }).setView([lat, lng], 15);
-
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
-            attribution: 'Tiles &copy; Esri — Source: Esri, Maxar'
-        }).addTo(map);
-
-        const icon = L.divIcon({
-            className: 'residence-marker-wrap',
-            html: '<span class="residence-marker"><i></i></span>',
-            iconSize: [34, 42],
-            iconAnchor: [17, 38],
-            popupAnchor: [0, -36]
+        const tira = document.getElementById('tiraMiniaturas');
+        tira.innerHTML = '';
+        fotosActuales.forEach((url, i) => {
+            const thumb = document.createElement('img');
+            thumb.src = url;
+            thumb.alt = `Miniatura ${i + 1}`;
+            thumb.style.width = '70px';
+            thumb.style.height = '50px';
+            thumb.style.cursor = 'pointer';
+            thumb.className = i === 0 ? 'rounded-3 object-fit-cover border border-warning border-2' : 'rounded-3 object-fit-cover border border-secondary opacity-75';
+            thumb.onclick = () => {
+                fotoIndiceActual = i;
+                actualizarVisorGaleria();
+            };
+            tira.appendChild(thumb);
         });
 
-        const marker = L.marker([lat, lng], { icon }).addTo(map);
-        marker.bindPopup(`<strong>@Model.Nombre</strong><br><small>@Model.Direccion</small>`).openPopup();
-    })();
-    </script>
+        actualizarVisorGaleria();
+        const modal = new bootstrap.Modal(document.getElementById('modalGaleriaFotos'));
+        modal.show();
     }
+
+    function actualizarVisorGaleria() {
+        const img = document.getElementById('imgGaleriaPrincipal');
+        img.src = fotosActuales[fotoIndiceActual];
+        document.getElementById('contadorFotos').textContent = `${fotoIndiceActual + 1} / ${fotosActuales.length}`;
+        
+        const thumbs = document.querySelectorAll('#tiraMiniaturas img');
+        thumbs.forEach((th, i) => {
+            if (i === fotoIndiceActual) {
+                th.className = 'rounded-3 object-fit-cover border border-warning border-2';
+            } else {
+                th.className = 'rounded-3 object-fit-cover border border-secondary opacity-75';
+            }
+        });
+    }
+
+    function siguienteFoto() {
+        if (!fotosActuales.length) return;
+        fotoIndiceActual = (fotoIndiceActual + 1) % fotosActuales.length;
+        actualizarVisorGaleria();
+    }
+
+    function anteriorFoto() {
+        if (!fotosActuales.length) return;
+        fotoIndiceActual = (fotoIndiceActual - 1 + fotosActuales.length) % fotosActuales.length;
+        actualizarVisorGaleria();
+    }
+
+    // ==========================================================================
+    // RECORRIDO 3D INTERACTIVO CON THREE.JS (PANORAMA ESFÉRICO 360°)
+    // ==========================================================================
+    let scene3d, camera3d, renderer3d, sphereMesh, isUserInteracting = false;
+    let onPointerDownMouseX = 0, onPointerDownMouseY = 0;
+    let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
+    let phi = 0, theta = 0, autoRotate = true;
+
+    const panoramas = [
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=85',
+        'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=2400&q=85',
+        'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=2400&q=85'
+    ];
+
+    function abrirTour3DModal(nombre, tipo) {
+        document.getElementById('modalTourTitulo').textContent = `${nombre} (${tipo})`;
+        const modalEl = document.getElementById('modalTour3D');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        modalEl.addEventListener('shown.bs.modal', function onShown() {
+            initThreeJsTour();
+            modalEl.removeEventListener('shown.bs.modal', onShown);
+        });
+    }
+
+    function initThreeJsTour() {
+        const container = document.getElementById('tour3d-canvas-container');
+        container.innerHTML = '';
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        scene3d = new THREE.Scene();
+        camera3d = new THREE.PerspectiveCamera(75, width / height, 1, 1100);
+        camera3d.target = new THREE.Vector3(0, 0, 0);
+
+        const geometry = new THREE.SphereGeometry(500, 60, 40);
+        geometry.scale(-1, 1, 1);
+
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load(panoramas[0]);
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+        sphereMesh = new THREE.Mesh(geometry, material);
+        scene3d.add(sphereMesh);
+
+        renderer3d = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer3d.setPixelRatio(window.devicePixelRatio);
+        renderer3d.setSize(width, height);
+        container.appendChild(renderer3d.domElement);
+
+        container.addEventListener('pointerdown', onPointerDown);
+        container.addEventListener('wheel', onDocumentMouseWheel, { passive: true });
+        window.addEventListener('resize', onTourResize);
+
+        animateTour();
+    }
+
+    function cambiarAmbiente3D(indice, btn) {
+        if (!sphereMesh) return;
+        const loader = new THREE.TextureLoader();
+        loader.load(panoramas[indice], (tex) => {
+            sphereMesh.material.map = tex;
+            sphereMesh.material.needsUpdate = true;
+        });
+
+        document.querySelectorAll('.btn-tour-room').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+    }
+
+    function onPointerDown(event) {
+        if (event.isPrimary === false) return;
+        isUserInteracting = true;
+        onPointerDownMouseX = event.clientX;
+        onPointerDownMouseY = event.clientY;
+        onPointerDownLon = lon;
+        onPointerDownLat = lat;
+
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+    }
+
+    function onPointerMove(event) {
+        if (event.isPrimary === false) return;
+        lon = (onPointerDownMouseX - event.clientX) * 0.15 + onPointerDownLon;
+        lat = (event.clientY - onPointerDownMouseY) * 0.15 + onPointerDownLat;
+    }
+
+    function onPointerUp(event) {
+        if (event.isPrimary === false) return;
+        isUserInteracting = false;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+    }
+
+    function onDocumentMouseWheel(event) {
+        if (!camera3d) return;
+        const fov = camera3d.fov + event.deltaY * 0.05;
+        camera3d.fov = THREE.MathUtils.clamp(fov, 35, 95);
+        camera3d.updateProjectionMatrix();
+    }
+
+    function zoomTour(delta) {
+        if (!camera3d) return;
+        camera3d.fov = THREE.MathUtils.clamp(camera3d.fov - delta * 10, 35, 95);
+        camera3d.updateProjectionMatrix();
+    }
+
+    function toggleAutoGiro() {
+        autoRotate = !autoRotate;
+        const btn = document.getElementById('btnToggleGiro');
+        if (btn) btn.style.background = autoRotate ? 'var(--sand)' : 'rgba(14, 39, 45, .82)';
+    }
+
+    function onTourResize() {
+        const container = document.getElementById('tour3d-canvas-container');
+        if (!container || !renderer3d || !camera3d) return;
+        camera3d.aspect = container.clientWidth / container.clientHeight;
+        camera3d.updateProjectionMatrix();
+        renderer3d.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    function animateTour() {
+        if (!renderer3d || !scene3d || !camera3d) return;
+        requestAnimationFrame(animateTour);
+
+        if (autoRotate && !isUserInteracting) {
+            lon += 0.08;
+        }
+
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = THREE.MathUtils.degToRad(90 - lat);
+        theta = THREE.MathUtils.degToRad(lon);
+
+        const x = 500 * Math.sin(phi) * Math.cos(theta);
+        const y = 500 * Math.cos(phi);
+        const z = 500 * Math.sin(phi) * Math.sin(theta);
+
+        camera3d.lookAt(x, y, z);
+        renderer3d.render(scene3d, camera3d);
+    }
+    </script>
 }

@@ -3,15 +3,18 @@
     ViewData["Title"] = "Alojamientos";
 }
 
-<section class="section-wrap">
-    <div class="section-heading">
+<section class="section-wrap" style="padding-top: 48px;">
+    <div class="section-heading mb-4">
         <div>
-            <p class="eyebrow">CATÁLOGO EXCLUSIVO</p>
+            <p class="eyebrow">ESTANCIAS EXCLUSIVAS</p>
             <h2>Alojamientos en Bahías de Huatulco</h2>
         </div>
+        <p class="text-muted small mb-0 d-none d-md-block">
+            Explora residencias con vistas al Pacífico, recorridos 3D y galerías en alta resolución.
+        </p>
     </div>
 
-    <div class="stay-grid">
+    <div class="stay-grid" style="gap: 32px;">
         @if (!Model.Any())
         {
             <article class="empty-card">
@@ -28,22 +31,340 @@
                     ? $"background-image: linear-gradient(180deg, transparent 55%, rgba(13,28,33,.6)), url('{stay.ImagenPrincipalUrl}');"
                     : "background: linear-gradient(135deg, #18434c, #0a2127);";
 
-                <a asp-controller="Alojamientos" asp-action="Detalle" asp-route-id="@stay.Id" class="stay-card" title="Ver toda la información de @stay.Nombre">
+                // Lista de imágenes para el modal
+                var listaFotos = stay.Imagenes.Any()
+                    ? stay.Imagenes.OrderBy(x => x.Orden).Select(x => x.RutaArchivo).ToList()
+                    : new List<string> { stay.ImagenPrincipalUrl ?? "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80" };
+                
+                var fotosJson = System.Text.Json.JsonSerializer.Serialize(listaFotos);
+
+                <div class="stay-card" onclick="window.location.href='@Url.Action("Detalle", "Alojamientos", new { id = stay.Id })'">
                     <div class="stay-image" style="@bgStyle">
                         <span class="stay-tag">@stay.Tipo</span>
+                        
+                        <!-- Botones de Fotos y Recorrido 3D en la tarjeta -->
+                        <div class="card-floating-actions" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-card-action" onclick="abrirGaleriaModal('@stay.Nombre', @fotosJson)" title="Ver fotos del alojamiento">
+                                📷 Fotos
+                            </button>
+                            <button type="button" class="btn-card-action" onclick="abrirTour3DModal('@stay.Nombre', '@stay.Tipo')" title="Abrir recorrido 3D interactivo">
+                                🌐 Recorrido 3D
+                            </button>
+                        </div>
                     </div>
+
                     <div class="stay-info">
                         <h3>@stay.Nombre</h3>
-                        <p class="mb-3">
+                        <p class="stay-specs">
                             @(string.IsNullOrWhiteSpace(stay.Direccion) ? "Bahías de Huatulco" : stay.Direccion) · @stay.CapacidadHuespedes huéspedes · @stay.NumeroHabitaciones hab. · @stay.NumeroBanos baños
                         </p>
-                        <div class="d-flex justify-content-between align-items-baseline mt-auto">
-                            <strong>Desde @stay.PrecioBasePorNoche.ToString("C") <small>MXN / noche</small></strong>
+                        
+                        <div class="stay-footer">
+                            <strong>Desde @stay.PrecioBasePorNoche.ToString("C") <small>MXN por noche</small></strong>
                             <span class="text-link small" style="color: var(--sea); font-weight: 700;">Ver detalles ↗</span>
                         </div>
                     </div>
-                </a>
+                </div>
             }
         }
     </div>
 </section>
+
+<!-- ==========================================================================
+     MODAL DE GALERÍA DE IMÁGENES
+     ========================================================================== -->
+<div class="modal fade" id="modalGaleriaFotos" tabindex="-1" aria-labelledby="modalGaleriaFotosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 overflow-hidden shadow-lg" style="background: #10272c; color: #fff;">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <div>
+                    <span class="eyebrow" style="color: var(--sand);">GALERÍA FOTOGRÁFICA</span>
+                    <h5 class="modal-title h4 fw-bold" id="modalGaleriaTitulo" style="font-family: 'Playfair Display', serif;">Fotos del alojamiento</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Visor principal de imagen -->
+                <div class="position-relative rounded-4 overflow-hidden mb-3 bg-black d-flex align-items-center justify-content-center" style="height: 440px;">
+                    <img id="imgGaleriaPrincipal" src="" alt="Fotografía" class="w-100 h-100 object-fit-cover" />
+                    
+                    <button type="button" class="btn-tour-ctrl position-absolute start-0 ms-3 top-50 translate-middle-y" onclick="anteriorFoto()" aria-label="Foto anterior">
+                        ❮
+                    </button>
+                    <button type="button" class="btn-tour-ctrl position-absolute end-0 me-3 top-50 translate-middle-y" onclick="siguienteFoto()" aria-label="Siguiente foto">
+                        ❯
+                    </button>
+                    
+                    <span id="contadorFotos" class="position-absolute bottom-0 start-50 translate-middle-x mb-3 px-3 py-1 rounded-pill small" style="background: rgba(0,0,0,.65); backdrop-filter: blur(6px); font-size: 11px;">
+                        1 / 1
+                    </span>
+                </div>
+                
+                <!-- Tira de miniaturas -->
+                <div id="tiraMiniaturas" class="d-flex gap-2 overflow-auto pb-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     MODAL DE RECORRIDO INTERACTIVO 3D (360° WebGL Three.js)
+     ========================================================================== -->
+<div class="modal fade" id="modalTour3D" tabindex="-1" aria-labelledby="modalTour3DLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content rounded-4 border-0 overflow-hidden shadow-lg" style="background: #09171b; color: #fff;">
+            <div class="modal-header border-0 pb-0 px-4 pt-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="tour-badge-3d">
+                        <span class="pulse-3d"></span> 360° INTERACTIVO
+                    </span>
+                    <h5 class="modal-title h4 fw-bold mb-0" id="modalTourTitulo" style="font-family: 'Playfair Display', serif;">Recorrido 3D</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <div class="tour-3d-box">
+                    <div id="tour3d-canvas-container" class="tour-3d-canvas-wrap" style="height: 520px;">
+                        <!-- Three.js Canvas se inyecta aquí -->
+                    </div>
+                    
+                    <div class="tour-3d-overlay">
+                        <div class="tour-top-bar">
+                            <div class="tour-rooms-nav">
+                                <button type="button" class="btn-tour-room active" onclick="cambiarAmbiente3D(0, this)">🛋️ Sala & Terraza</button>
+                                <button type="button" class="btn-tour-room" onclick="cambiarAmbiente3D(1, this)">🛏️ Recámara Master</button>
+                                <button type="button" class="btn-tour-room" onclick="cambiarAmbiente3D(2, this)">🌊 Alberca & Vista al Mar</button>
+                            </div>
+                        </div>
+
+                        <div class="tour-bottom-bar">
+                            <span class="tour-hint">
+                                👆 <strong>Arrastra con el mouse o dedo</strong> para girar 360° en cualquier dirección
+                            </span>
+                            <div class="tour-quick-controls">
+                                <button type="button" class="btn-tour-ctrl" id="btnToggleGiro" onclick="toggleAutoGiro()" title="Giro automático">
+                                    🔄
+                                </button>
+                                <button type="button" class="btn-tour-ctrl" onclick="zoomTour(1)" title="Acercar">
+                                    +
+                                </button>
+                                <button type="button" class="btn-tour-ctrl" onclick="zoomTour(-1)" title="Alejar">
+                                    −
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==========================================================================
+// GALERÍA FOTOGRÁFICA (MODAL)
+// ==========================================================================
+let fotosActuales = [];
+let fotoIndiceActual = 0;
+
+function abrirGaleriaModal(titulo, fotos) {
+    fotosActuales = fotos && fotos.length ? fotos : [];
+    fotoIndiceActual = 0;
+    document.getElementById('modalGaleriaTitulo').textContent = titulo;
+    actualizarVisorGaleria();
+    
+    // Generar miniaturas
+    const tira = document.getElementById('tiraMiniaturas');
+    tira.innerHTML = '';
+    fotosActuales.forEach((src, idx) => {
+        const thumb = document.createElement('img');
+        thumb.src = src;
+        thumb.className = 'rounded-3 object-fit-cover border ' + (idx === 0 ? 'border-warning border-2' : 'border-secondary opacity-75');
+        thumb.style.width = '74px';
+        thumb.style.height = '52px';
+        thumb.style.cursor = 'pointer';
+        thumb.onclick = () => { fotoIndiceActual = idx; actualizarVisorGaleria(); };
+        tira.appendChild(thumb);
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('modalGaleriaFotos'));
+    modal.show();
+}
+
+function actualizarVisorGaleria() {
+    if (!fotosActuales.length) return;
+    document.getElementById('imgGaleriaPrincipal').src = fotosActuales[fotoIndiceActual];
+    document.getElementById('contadorFotos').textContent = `${fotoIndiceActual + 1} / ${fotosActuales.length}`;
+    
+    // Actualizar borde activo en miniaturas
+    const thumbs = document.querySelectorAll('#tiraMiniaturas img');
+    thumbs.forEach((th, i) => {
+        if (i === fotoIndiceActual) {
+            th.className = 'rounded-3 object-fit-cover border border-warning border-2';
+        } else {
+            th.className = 'rounded-3 object-fit-cover border border-secondary opacity-75';
+        }
+    });
+}
+
+function siguienteFoto() {
+    if (!fotosActuales.length) return;
+    fotoIndiceActual = (fotoIndiceActual + 1) % fotosActuales.length;
+    actualizarVisorGaleria();
+}
+
+function anteriorFoto() {
+    if (!fotosActuales.length) return;
+    fotoIndiceActual = (fotoIndiceActual - 1 + fotosActuales.length) % fotosActuales.length;
+    actualizarVisorGaleria();
+}
+
+// ==========================================================================
+// RECORRIDO 3D INTERACTIVO CON THREE.JS (PANORAMA ESFÉRICO 360°)
+// ==========================================================================
+let scene3d, camera3d, renderer3d, sphereMesh, isUserInteracting = false;
+let onPointerDownMouseX = 0, onPointerDownMouseY = 0;
+let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
+let phi = 0, theta = 0, autoRotate = true;
+
+// Texturas 360 panorámicas en alta resolución
+const panoramas = [
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=85', // Sala de estar moderna
+    'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=2400&q=85', // Master suite
+    'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=2400&q=85'  // Alberca con vista al mar
+];
+
+function abrirTour3DModal(nombre, tipo) {
+    document.getElementById('modalTourTitulo').textContent = `${nombre} (${tipo})`;
+    const modalEl = document.getElementById('modalTour3D');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    modalEl.addEventListener('shown.bs.modal', function onShown() {
+        initThreeJsTour();
+        modalEl.removeEventListener('shown.bs.modal', onShown);
+    });
+}
+
+function initThreeJsTour() {
+    const container = document.getElementById('tour3d-canvas-container');
+    container.innerHTML = '';
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    scene3d = new THREE.Scene();
+    camera3d = new THREE.PerspectiveCamera(75, width / height, 1, 1100);
+    camera3d.target = new THREE.Vector3(0, 0, 0);
+
+    // Esfera invertida para proyectar el panorama 360
+    const geometry = new THREE.SphereGeometry(500, 60, 40);
+    geometry.scale(-1, 1, 1);
+
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load(panoramas[0]);
+    const material = new THREE.MeshBasicMaterial({ map: texture });
+    sphereMesh = new THREE.Mesh(geometry, material);
+    scene3d.add(sphereMesh);
+
+    renderer3d = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer3d.setPixelRatio(window.devicePixelRatio);
+    renderer3d.setSize(width, height);
+    container.appendChild(renderer3d.domElement);
+
+    // Eventos de arrastre táctil y mouse
+    container.addEventListener('pointerdown', onPointerDown);
+    container.addEventListener('wheel', onDocumentMouseWheel, { passive: true });
+    window.addEventListener('resize', onTourResize);
+
+    animateTour();
+}
+
+function cambiarAmbiente3D(indice, btn) {
+    if (!sphereMesh) return;
+    const loader = new THREE.TextureLoader();
+    loader.load(panoramas[indice], (tex) => {
+        sphereMesh.material.map = tex;
+        sphereMesh.material.needsUpdate = true;
+    });
+
+    document.querySelectorAll('.btn-tour-room').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+}
+
+function onPointerDown(event) {
+    if (event.isPrimary === false) return;
+    isUserInteracting = true;
+    onPointerDownMouseX = event.clientX;
+    onPointerDownMouseY = event.clientY;
+    onPointerDownLon = lon;
+    onPointerDownLat = lat;
+
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+}
+
+function onPointerMove(event) {
+    if (event.isPrimary === false) return;
+    lon = (onPointerDownMouseX - event.clientX) * 0.15 + onPointerDownLon;
+    lat = (event.clientY - onPointerDownMouseY) * 0.15 + onPointerDownLat;
+}
+
+function onPointerUp(event) {
+    if (event.isPrimary === false) return;
+    isUserInteracting = false;
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+}
+
+function onDocumentMouseWheel(event) {
+    if (!camera3d) return;
+    const fov = camera3d.fov + event.deltaY * 0.05;
+    camera3d.fov = THREE.MathUtils.clamp(fov, 35, 95);
+    camera3d.updateProjectionMatrix();
+}
+
+function zoomTour(delta) {
+    if (!camera3d) return;
+    camera3d.fov = THREE.MathUtils.clamp(camera3d.fov - delta * 10, 35, 95);
+    camera3d.updateProjectionMatrix();
+}
+
+function toggleAutoGiro() {
+    autoRotate = !autoRotate;
+    const btn = document.getElementById('btnToggleGiro');
+    if (btn) btn.style.background = autoRotate ? 'var(--sand)' : 'rgba(14, 39, 45, .82)';
+}
+
+function onTourResize() {
+    const container = document.getElementById('tour3d-canvas-container');
+    if (!container || !renderer3d || !camera3d) return;
+    camera3d.aspect = container.clientWidth / container.clientHeight;
+    camera3d.updateProjectionMatrix();
+    renderer3d.setSize(container.clientWidth, container.clientHeight);
+}
+
+function animateTour() {
+    if (!renderer3d || !scene3d || !camera3d) return;
+    requestAnimationFrame(animateTour);
+
+    if (autoRotate && !isUserInteracting) {
+        lon += 0.08;
+    }
+
+    lat = Math.max(-85, Math.min(85, lat));
+    phi = THREE.MathUtils.degToRad(90 - lat);
+    theta = THREE.MathUtils.degToRad(lon);
+
+    const x = 500 * Math.sin(phi) * Math.cos(theta);
+    const y = 500 * Math.cos(phi);
+    const z = 500 * Math.sin(phi) * Math.sin(theta);
+
+    camera3d.lookAt(x, y, z);
+    renderer3d.render(scene3d, camera3d);
+}
+</script>
+}
