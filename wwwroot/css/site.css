@@ -27,16 +27,49 @@ body {
    CABECERA Y NAVEGACIÓN
    ========================================================================== */
 .site-header {
-    height: 82px;
-    padding: 0 clamp(20px, 5vw, 80px);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     background: #fff;
     border-bottom: 1px solid var(--line);
     position: sticky;
     top: 0;
     z-index: 1000;
+}
+.site-header-inner {
+    height: 82px;
+    padding: 0 clamp(20px, 5vw, 80px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Botón Hamburguesa Móvil */
+.mobile-menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    transition: background .2s;
+}
+.mobile-menu-toggle:hover,
+.mobile-menu-toggle:focus {
+    background: rgba(16, 39, 44, .06);
+    outline: none;
+}
+.mobile-menu-toggle .menu-bar {
+    display: block;
+    width: 22px;
+    height: 2.5px;
+    background-color: var(--deep);
+    border-radius: 2px;
+    transition: all .25s ease-in-out;
 }
 
 .brand {
@@ -70,13 +103,15 @@ body {
     letter-spacing: 0;
 }
 
-.site-header nav {
+.site-header nav,
+.nav-links-wrap {
     display: flex;
     align-items: center;
     gap: 24px;
 }
 .site-header nav > a,
-.site-header nav .nav-item-link {
+.site-header nav .nav-item-link,
+.nav-links-wrap > a {
     font-size: 13px;
     font-weight: 600;
     letter-spacing: .3px;
@@ -85,7 +120,8 @@ body {
     transition: color .2s;
 }
 .site-header nav > a:hover,
-.site-header nav .nav-item-link:hover {
+.site-header nav .nav-item-link:hover,
+.nav-links-wrap > a:hover {
     color: var(--sea);
 }
 
@@ -96,12 +132,14 @@ body {
     color: var(--sea) !important;
     font-weight: 700 !important;
     border: 1px solid #c9dedf;
+    text-decoration: none;
 }
 .nav-admin-badge:hover {
     background: #d8eaeb;
 }
 
-.site-header nav .nav-login {
+.site-header nav .nav-login,
+.nav-links-wrap .nav-login {
     padding: 9px 20px;
     border: 1px solid #ced2cd;
     border-radius: 30px;
@@ -111,13 +149,15 @@ body {
     font-weight: 600;
     transition: all .2s;
 }
-.site-header nav .nav-login:hover {
+.site-header nav .nav-login:hover,
+.nav-links-wrap .nav-login:hover {
     border-color: var(--sea);
     color: var(--sea);
     background: #f7faf9;
 }
 
-.site-header nav .nav-register {
+.site-header nav .nav-register,
+.nav-links-wrap .nav-register {
     padding: 9px 20px;
     border-radius: 30px;
     background: var(--sand);
@@ -127,7 +167,8 @@ body {
     font-weight: 700;
     transition: background .2s;
 }
-.site-header nav .nav-register:hover {
+.site-header nav .nav-register:hover,
+.nav-links-wrap .nav-register:hover {
     background: var(--sand-hover);
 }
 
@@ -892,6 +933,66 @@ footer.site-footer > span {
    RESPONSIVE DESIGN & MOBILE OPTIMIZATION
    ========================================================================== */
 @media (max-width: 991px) {
+    .site-header {
+        height: auto;
+    }
+    .site-header-inner {
+        height: 68px;
+        padding: 0 18px;
+    }
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    #navMenuContent.collapse:not(.show) {
+        display: none !important;
+    }
+    #navMenuContent.collapsing,
+    #navMenuContent.collapse.show {
+        display: block !important;
+        background: #fff;
+        border-top: 1px solid var(--line);
+        padding: 16px 20px 24px;
+        box-shadow: 0 16px 30px rgba(16, 39, 44, .1);
+    }
+    .nav-links-wrap {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .nav-links-wrap > a {
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 14px;
+        display: block;
+        background: rgba(16, 39, 44, .03);
+    }
+    .nav-links-wrap > a:hover {
+        background: #eef5f5;
+        color: var(--sea);
+    }
+    .nav-divider {
+        height: 1px;
+        background: var(--line);
+        margin: 6px 0;
+    }
+    .nav-links-wrap .nav-login,
+    .nav-links-wrap .nav-register {
+        text-align: center;
+        padding: 12px 20px;
+        font-size: 14px;
+        display: block;
+        width: 100%;
+    }
+    .nav-user-greeting {
+        text-align: center;
+        padding: 8px 0;
+        font-weight: 600;
+    }
+    .nav-logout-btn {
+        width: 100%;
+        padding: 12px 20px;
+        text-align: center;
+    }
     .sticky-top {
         position: static !important;
         margin-top: 20px;
@@ -907,31 +1008,6 @@ footer.site-footer > span {
 }
 
 @media (max-width: 780px) {
-    .site-header {
-        height: auto;
-        min-height: 70px;
-        padding: 12px 18px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    .site-header nav {
-        gap: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        overflow-x: auto;
-        padding-bottom: 2px;
-        -webkit-overflow-scrolling: touch;
-    }
-    .site-header nav > a,
-    .site-header nav .nav-item-link,
-    .site-header nav .nav-login,
-    .site-header nav .nav-register {
-        font-size: 12px;
-        padding: 6px 12px;
-        white-space: nowrap;
-    }
     .map-hero {
         height: calc(90vh - 75px);
         min-height: 560px;
