@@ -21,12 +21,13 @@ final class AdminActivityController extends Controller
             "SELECT r.*, a.name AS activity, u.full_name, u.email
              FROM activity_requests r
              JOIN activities a ON a.id = r.activity_id JOIN users u ON u.id = r.user_id
-             ORDER BY r.status <> 'pending', r.requested_date, r.id"
+             ORDER BY r.status <> 'pending', r.requested_date, r.requested_time, r.id"
         )->fetchAll();
         $editId = filter_input(INPUT_GET, 'editar', FILTER_VALIDATE_INT);
         $this->view('admin/activities', [
             'activities' => $activities,
             'requests' => $requests,
+            'now' => date('Y-m-d H:i:s'),
             'edit' => array_column($activities, null, 'id')[$editId] ?? [],
             'categories' => self::CATEGORIES,
             'sections' => Activity::SECTIONS,
@@ -84,9 +85,10 @@ final class AdminActivityController extends Controller
         }
         $query = $db->prepare(
             "UPDATE activity_requests SET status = ?, response = ?, reviewed_by = ?, reviewed_at = UTC_TIMESTAMP()
-             WHERE id = ? AND status = 'pending' AND (? = 'declined' OR requested_date >= ?)"
+             WHERE id = ? AND status = 'pending'
+             AND (? = 'declined' OR TIMESTAMP(requested_date, COALESCE(requested_time, '23:59:59')) >= ?)"
         );
-        $query->execute([$decision, $response ?: null, $_SESSION['user_id'], $id, $decision, date('Y-m-d')]);
+        $query->execute([$decision, $response ?: null, $_SESSION['user_id'], $id, $decision, date('Y-m-d H:i:s')]);
         $_SESSION['admin_activity_notice'] = $query->rowCount() === 1
             ? 'Decisión guardada. El cliente puede consultarla en Mis solicitudes.'
             : 'La solicitud ya se revisó, no existe o la fecha solicitada ya pasó.';

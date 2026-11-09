@@ -26,7 +26,7 @@ final class Activity
     public function requestsFor(int $userId): array
     {
         $query = Database::connection()->prepare(
-            'SELECT a.name, r.requested_date, r.participants, r.status, r.response
+            'SELECT a.name, r.requested_date, r.requested_time, r.adults, r.children, r.participants, r.status, r.response
              FROM activity_requests r JOIN activities a ON a.id = r.activity_id
              WHERE r.user_id = ? ORDER BY r.created_at DESC, r.id DESC'
         );
@@ -34,15 +34,16 @@ final class Activity
         return $query->fetchAll();
     }
 
-    public function request(int $activityId, int $userId, string $date, int $participants): string
+    public function request(int $activityId, int $userId, string $date, string $time, int $adults, int $children): string
     {
+        $participants = $adults + $children;
         $query = Database::connection()->prepare(
-            'INSERT INTO activity_requests (activity_id, user_id, requested_date, participants)
-             SELECT id, ?, ?, ? FROM activities WHERE id = ? AND is_published = 1
+            'INSERT INTO activity_requests (activity_id, user_id, requested_date, requested_time, adults, children, participants)
+             SELECT id, ?, ?, ?, ?, ?, ? FROM activities WHERE id = ? AND is_published = 1
              AND (capacity IS NULL OR capacity >= ?)'
         );
         try {
-            $query->execute([$userId, $date, $participants, $activityId, $participants]);
+            $query->execute([$userId, $date, $time, $adults, $children, $participants, $activityId, $participants]);
         } catch (PDOException $exception) {
             if ((int) ($exception->errorInfo[1] ?? 0) !== 1062) {
                 throw $exception;

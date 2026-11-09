@@ -195,3 +195,8 @@ ALTER TABLE activities ADD COLUMN IF NOT EXISTS catalog_section
 
 ALTER TABLE activities MODIFY COLUMN catalog_section
     ENUM('acuatica', 'aventura', 'cultura', 'aerea') NULL;
+
+ALTER TABLE activity_requests
+    ADD COLUMN IF NOT EXISTS requested_time TIME NULL,
+    ADD COLUMN IF NOT EXISTS adults SMALLINT UNSIGNED NULL,
+    ADD COLUMN IF NOT EXISTS children SMALLINT UNSIGNED NULL;

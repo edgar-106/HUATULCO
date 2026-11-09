@@ -1,16 +1,15 @@
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const requestDialog = document.querySelector('#activity-request-dialog');
 
 for (const carousel of document.querySelectorAll('.activity-carousel')) {
     const track = carousel.querySelector('.activity-track');
-    const toolbar = carousel.querySelector('.activity-carousel-toolbar');
-    if (!toolbar) continue;
+    const arrows = carousel.querySelector('.activity-carousel-arrows');
+    if (!arrows) continue;
 
-    const previous = toolbar.querySelector('[data-step="-1"]');
-    const next = toolbar.querySelector('[data-step="1"]');
-    const autoplay = toolbar.querySelector('.activity-autoplay');
+    const previous = arrows.querySelector('[data-step="-1"]');
+    const next = arrows.querySelector('[data-step="1"]');
     const cards = track.querySelectorAll('.activity-card');
     let timer;
-    let paused = motion.matches;
     let visible = false;
     let interacting = false;
 
@@ -22,32 +21,27 @@ for (const carousel of document.querySelectorAll('.activity-carousel')) {
     };
     const schedule = () => {
         clearTimeout(timer);
-        if (paused || !visible || document.hidden || end() <= 1 ||
+        if (motion.matches || !visible || document.hidden || requestDialog?.open || end() <= 1 ||
             interacting || track.matches(':focus-within')) return;
 
         timer = setTimeout(() => {
+            if (requestDialog?.open) return;
             scroll(1, true);
             schedule();
         }, 5000);
     };
     const update = () => {
-        toolbar.hidden = end() <= 1;
+        arrows.hidden = end() <= 1;
         previous.disabled = track.scrollLeft <= 1;
         next.disabled = track.scrollLeft >= end() - 1;
-        autoplay.textContent = paused ? '▶' : 'Ⅱ';
-        autoplay.setAttribute('aria-label', paused ? 'Reanudar desplazamiento automático' : 'Pausar desplazamiento automático');
     };
 
-    toolbar.addEventListener('click', (event) => {
-        const button = event.target.closest('button');
-        if (button === autoplay) {
-            paused = !paused;
-            update();
-        } else if (button?.dataset.step) {
+    for (const button of [previous, next]) {
+        button.addEventListener('click', () => {
             scroll(Number(button.dataset.step));
-        }
-        schedule();
-    });
+            schedule();
+        });
+    }
 
     track.addEventListener('scroll', update, { passive: true });
     track.addEventListener('pointerenter', (event) => {
@@ -71,11 +65,8 @@ for (const carousel of document.querySelectorAll('.activity-carousel')) {
     carousel.addEventListener('focusin', schedule);
     carousel.addEventListener('focusout', () => setTimeout(schedule, 0));
     document.addEventListener('visibilitychange', schedule);
-    motion.addEventListener('change', () => {
-        paused = motion.matches;
-        update();
-        schedule();
-    });
+    requestDialog?.addEventListener('close', schedule);
+    motion.addEventListener('change', schedule);
     new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
         schedule();

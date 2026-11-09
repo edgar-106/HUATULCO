@@ -17,14 +17,21 @@
         <?php if (!$requests): ?><p>Aún no hay solicitudes.</p><?php endif; ?>
         <?php foreach ($requests as $request): ?>
             <article>
-                <h3><?= $e($request['activity']) ?> · <?= $e($request['requested_date']) ?></h3>
-                <p><?= $e($request['full_name']) ?> (<?= $e($request['email']) ?>) · <?= $e($request['participants']) ?> persona(s)</p>
+                <h3><?= $e($request['activity']) ?> · <?= $e($request['requested_date']) ?><?= $request['requested_time'] !== null ? ' · ' . $e(substr($request['requested_time'], 0, 5)) : '' ?></h3>
+                <p>
+                    <?= $e($request['full_name']) ?> (<?= $e($request['email']) ?>) ·
+                    <?php if ($request['adults'] !== null): ?>
+                        <?= $e($request['adults']) ?> adulto(s) y <?= $e($request['children']) ?> niño(s)
+                    <?php else: ?>
+                        <?= $e($request['participants']) ?> persona(s)
+                    <?php endif; ?>
+                </p>
                 <?php if ($request['status'] === 'pending'): ?>
                     <form method="post" action="<?= $e($app['base_url']) ?>/admin/actividades/revisar" class="travel-form">
                         <input type="hidden" name="token" value="<?= $e($token) ?>">
                         <input type="hidden" name="id" value="<?= $e($request['id']) ?>">
                         <label>Mensaje para el cliente (opcional) <textarea name="response" maxlength="500"></textarea></label>
-                        <?php if ($request['requested_date'] >= date('Y-m-d')): ?>
+                        <?php if ($request['requested_date'] . ' ' . ($request['requested_time'] ?? '23:59:59') >= $now): ?>
                             <button name="decision" value="confirmed">Confirmar disponibilidad</button>
                         <?php endif; ?>
                         <button name="decision" value="declined">Rechazar solicitud</button>

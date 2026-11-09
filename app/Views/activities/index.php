@@ -38,51 +38,47 @@ $icons = [
     <?php foreach ($sections as $key => $title): ?>
     <?php $activities = $groups[$key]; ?>
     <section class="activity-carousel" id="<?= $e($key) ?>" aria-labelledby="activity-title-<?= $e($key) ?>">
-        <div class="activity-section-heading">
-        <h2 id="activity-title-<?= $e($key) ?>"><?= $e($title) ?></h2>
-        <?php if (count($activities) > 1): ?>
-            <div class="activity-carousel-toolbar" hidden>
-                <button type="button" class="activity-autoplay" aria-label="Pausar desplazamiento automático">Ⅱ</button>
-                <button type="button" data-step="-1" aria-label="Actividades anteriores" aria-controls="activity-track-<?= $e($key) ?>">←</button>
-                <button type="button" data-step="1" aria-label="Actividades siguientes" aria-controls="activity-track-<?= $e($key) ?>">→</button>
-            </div>
-        <?php endif; ?>
-        </div>
+        <h2 class="activity-section-heading" id="activity-title-<?= $e($key) ?>"><?= $e($title) ?></h2>
         <?php if (!$activities): ?><p>Próximamente publicaremos nuevas experiencias.</p><?php endif; ?>
-        <div class="activity-track" id="activity-track-<?= $e($key) ?>" tabindex="0" aria-label="<?= $e($title) ?>, desplaza para ver más actividades">
-            <?php foreach ($activities as $activity): ?>
-                <?php $photo = $photos[$activity['name']] ?? null; ?>
-                <article class="activity-card">
-                    <?php if ($photo): ?>
-                        <img class="activity-photo" src="<?= $e($app['base_url']) ?>/assets/img/activities/<?= $e($photo[0]) ?>"
-                            alt="<?= $e($photo[1]) ?>" width="900" height="600" loading="lazy" decoding="async">
-                    <?php else: ?>
-                        <div class="activity-art activity-art-<?= $e($key) ?>" aria-hidden="true">
-                            <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="<?= $e($icons[$key]) ?>"/>
-                            </svg>
-                        </div>
-                    <?php endif; ?>
-                    <div class="activity-card-content">
-                        <p class="eyebrow"><?= $e($activity['category']) ?></p>
-                        <h3><?= $e($activity['name']) ?></h3>
-                        <p><?= $e($activity['description']) ?></p>
-                        <p><?= $activity['duration_minutes'] ? $e($activity['duration_minutes']) . ' min · ' : '' ?>
-                            <?= (float) $activity['price'] > 0 ? '$' . number_format((float) $activity['price'], 2) . ' MXN' : 'Precio por confirmar' ?></p>
-                        <?php if (isset($_SESSION['user_id'])): ?>
-                            <form method="post" action="<?= $e($app['base_url']) ?>/actividades/solicitar" class="travel-form">
-                                <input type="hidden" name="token" value="<?= $e($token) ?>">
-                                <input type="hidden" name="activity_id" value="<?= $e($activity['id']) ?>">
-                                <label>Fecha <input name="date" type="date" min="<?= $e(date('Y-m-d')) ?>" required></label>
-                                <label>Personas <input name="participants" type="number" min="1" max="<?= $e($activity['capacity'] ?? 65535) ?>" value="1" required></label>
-                                <button class="button button-gold">Consultar disponibilidad</button>
-                            </form>
+        <div class="activity-carousel-frame">
+            <?php if (count($activities) > 1): ?>
+                <div class="activity-carousel-arrows" hidden>
+                    <button type="button" data-step="-1" aria-label="Actividades anteriores" aria-controls="activity-track-<?= $e($key) ?>">←</button>
+                    <button type="button" data-step="1" aria-label="Actividades siguientes" aria-controls="activity-track-<?= $e($key) ?>">→</button>
+                </div>
+            <?php endif; ?>
+            <div class="activity-track" id="activity-track-<?= $e($key) ?>" tabindex="0" aria-label="<?= $e($title) ?>, desplaza para ver más actividades">
+                <?php foreach ($activities as $activity): ?>
+                    <?php $photo = $photos[$activity['name']] ?? null; ?>
+                    <article class="activity-card">
+                        <?php if ($photo): ?>
+                            <img class="activity-photo" src="<?= $e($app['base_url']) ?>/assets/img/activities/<?= $e($photo[0]) ?>"
+                                alt="<?= $e($photo[1]) ?>" width="900" height="600" loading="lazy" decoding="async">
                         <?php else: ?>
-                            <a class="button button-gold" href="<?= $e($app['base_url']) ?>/cuenta/ingresar">Ingresa para solicitar</a>
+                            <div class="activity-art activity-art-<?= $e($key) ?>" aria-hidden="true">
+                                <svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="<?= $e($icons[$key]) ?>"/>
+                                </svg>
+                            </div>
                         <?php endif; ?>
-                    </div>
-                </article>
-            <?php endforeach; ?>
+                        <div class="activity-card-content">
+                            <p class="eyebrow"><?= $e($activity['category']) ?></p>
+                            <h3><?= $e($activity['name']) ?></h3>
+                            <p><?= $e($activity['description']) ?></p>
+                            <p><?= $activity['duration_minutes'] ? $e($activity['duration_minutes']) . ' min · ' : '' ?>
+                                <?= (float) $activity['price'] > 0 ? '$' . number_format((float) $activity['price'], 2) . ' MXN' : 'Precio por confirmar' ?></p>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                                <button type="button" class="button button-gold activity-request-open" aria-haspopup="dialog"
+                                    aria-controls="activity-request-dialog" aria-label="Consultar disponibilidad para <?= $e($activity['name']) ?>"
+                                    data-activity-id="<?= $e($activity['id']) ?>" data-activity-name="<?= $e($activity['name']) ?>"
+                                    data-activity-capacity="<?= $e($activity['capacity'] ?? 65535) ?>">Consultar disponibilidad</button>
+                            <?php else: ?>
+                                <a class="button button-gold" href="<?= $e($app['base_url']) ?>/cuenta/ingresar">Ingresa para solicitar</a>
+                            <?php endif; ?>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
         </div>
     </section>
     <?php endforeach; ?>
@@ -98,13 +94,48 @@ $icons = [
         <?php $labels = ['pending' => 'Pendiente de revisión', 'confirmed' => 'Confirmada', 'declined' => 'Rechazada']; ?>
         <?php foreach ($requests as $request): ?>
             <article>
-                <h3><?= $e($request['name']) ?> · <?= $e($request['requested_date']) ?></h3>
-                <p><?= $e($request['participants']) ?> persona(s) · <strong><?= $e($labels[$request['status']]) ?></strong></p>
+                <h3><?= $e($request['name']) ?> · <?= $e($request['requested_date']) ?><?= $request['requested_time'] !== null ? ' · ' . $e(substr($request['requested_time'], 0, 5)) : '' ?></h3>
+                <p>
+                    <?php if ($request['adults'] !== null): ?>
+                        <?= $e($request['adults']) ?> adulto(s) y <?= $e($request['children']) ?> niño(s)
+                    <?php else: ?>
+                        <?= $e($request['participants']) ?> persona(s)
+                    <?php endif; ?>
+                    · <strong><?= $e($labels[$request['status']]) ?></strong>
+                </p>
                 <?php if ($request['response']): ?><p><?= $e($request['response']) ?></p><?php endif; ?>
             </article>
         <?php endforeach; ?>
     </section>
 </main>
+<?php if (isset($_SESSION['user_id'])): ?>
+    <dialog id="activity-request-dialog" class="activity-request-dialog" aria-labelledby="activity-request-title">
+        <form method="dialog">
+            <button type="submit" class="activity-request-close" aria-label="Cerrar panel">×</button>
+        </form>
+        <p class="eyebrow">CONSULTA DE DISPONIBILIDAD</p>
+        <h2 id="activity-request-title"></h2>
+        <p class="activity-request-intro">El equipo revisará la fecha y hora que solicites.</p>
+        <form method="post" action="<?= $e($app['base_url']) ?>/actividades/solicitar" class="travel-form activity-request-form">
+            <input type="hidden" name="token" value="<?= $e($token) ?>">
+            <input type="hidden" name="activity_id">
+            <label>Fecha de la actividad
+                <input name="date" type="date" min="<?= $e($firstRequestDate) ?>" aria-describedby="activity-date-help" required autofocus>
+                <small id="activity-date-help">Desde el <?= $e(date('d/m/Y', strtotime($firstRequestDate))) ?></small>
+            </label>
+            <label>Hora de Huatulco <input name="time" type="time" required></label>
+            <fieldset class="activity-request-group">
+                <legend>Participantes</legend>
+                <div>
+                    <label>Adultos <input name="adults" type="number" min="0" value="1" required></label>
+                    <label>Niños <input name="children" type="number" min="0" value="0" required></label>
+                </div>
+            </fieldset>
+            <button class="button button-gold" type="submit">Enviar solicitud</button>
+        </form>
+    </dialog>
+    <script src="<?= $e($app['base_url']) ?>/assets/js/activity-request.js" defer></script>
+<?php endif; ?>
 <script src="<?= $e($app['base_url']) ?>/assets/js/activity-carousel.js" defer></script>
 <footer><a class="brand brand-footer" href="<?= $e($app['base_url']) ?>/">HUATULCO<small>ESTANCIAS & EXPERIENCIAS</small></a><p>Bahías de Huatulco, Oaxaca · México</p></footer>
 </body>
