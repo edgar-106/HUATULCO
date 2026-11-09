@@ -102,16 +102,21 @@
                     ? $"background-image: linear-gradient(180deg, transparent 55%, rgba(13,28,33,.6)), url('{stay.ImagenPrincipalUrl}');"
                     : "background: linear-gradient(135deg, #18434c, #0a2127);";
 
-                <article class="stay-card">
+                <a asp-controller="Alojamientos" asp-action="Detalle" asp-route-id="@stay.Id" class="stay-card" title="Ver toda la información de @stay.Nombre">
                     <div class="stay-image" style="@bgStyle">
                         <span class="stay-tag">@stay.Tipo</span>
                     </div>
                     <div class="stay-info">
                         <h3>@stay.Nombre</h3>
-                        <p>@(string.IsNullOrWhiteSpace(stay.Direccion) ? "Bahías de Huatulco" : stay.Direccion) · Hasta @stay.CapacidadHuespedes huéspedes</p>
-                        <strong>Desde @stay.PrecioBasePorNoche.ToString("C") <small>MXN / noche</small></strong>
+                        <p class="mb-3">
+                            @(string.IsNullOrWhiteSpace(stay.Direccion) ? "Bahías de Huatulco" : stay.Direccion) · @stay.CapacidadHuespedes huéspedes · @stay.NumeroHabitaciones hab. · @stay.NumeroBanos baños
+                        </p>
+                        <div class="d-flex justify-content-between align-items-baseline mt-auto">
+                            <strong>Desde @stay.PrecioBasePorNoche.ToString("C") <small>MXN / noche</small></strong>
+                            <span class="text-link small" style="color: var(--sea); font-weight: 700;">Ver detalles ↗</span>
+                        </div>
                     </div>
-                </article>
+                </a>
             }
         }
     </div>
@@ -188,8 +193,8 @@
         price.textContent = 'Desde $' + new Intl.NumberFormat('es-MX').format(home.price) + ' MXN / noche';
         
         const link = document.createElement('a');
-        link.href = '/Alojamientos';
-        link.textContent = 'Ver alojamiento →';
+        link.href = '/Alojamientos/Detalle/' + home.id;
+        link.textContent = 'Ver toda la información →';
         
         popup.append(label, title, price, link);
         marker.bindPopup(popup);

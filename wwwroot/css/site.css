@@ -518,10 +518,14 @@ body {
     transition: transform .25s, box-shadow .25s;
     display: flex;
     flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
 }
 .stay-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 14px 34px rgba(22, 48, 50, .12);
+    color: inherit;
 }
 .stay-image {
     height: 230px;
