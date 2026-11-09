@@ -22,17 +22,17 @@
 }
 
 <div class="section-wrap" style="padding-top: 40px;">
-    <!-- Migas de pan / Regresar -->
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0" style="font-size: 13px;">
+    <!-- Migas de pan / Regresar Responsivo -->
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
+        <nav aria-label="breadcrumb" class="overflow-hidden">
+            <ol class="breadcrumb mb-0 text-nowrap" style="font-size: 13px;">
                 <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" style="color: var(--sea); text-decoration: none;">Inicio</a></li>
                 <li class="breadcrumb-item"><a asp-controller="Alojamientos" asp-action="Index" style="color: var(--sea); text-decoration: none;">Alojamientos</a></li>
-                <li class="breadcrumb-item active text-muted" aria-current="page">@Model.Nombre</li>
+                <li class="breadcrumb-item active text-muted text-truncate d-none d-md-inline" style="max-width: 260px;" aria-current="page">@Model.Nombre</li>
             </ol>
         </nav>
-        <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-            ← Volver al catálogo
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap flex-shrink-0" style="font-size: 12px; font-weight: 600;">
+            ← Volver<span class="d-none d-sm-inline"> al catálogo</span>
         </a>
     </div>
 
