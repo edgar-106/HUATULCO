@@ -29,33 +29,54 @@ public static class SeedData
             }
         }
 
-        var email = config["BootstrapAdmin:Email"] ?? "admin@huatulcotravel.com";
+        var email = (config["BootstrapAdmin:Email"] ?? "admin@huatulcotravel.com").Trim();
         var password = config["BootstrapAdmin:Password"] ?? "Admin1234#*";
         var name = config["BootstrapAdmin:Name"] ?? "Administrador Huatulco";
 
-        if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(password) && (await users.GetUsersInRoleAsync("Administrador")).Count == 0)
+        var admin = await users.FindByEmailAsync(email);
+        if (admin == null)
         {
-            var admin = await users.FindByEmailAsync(email);
-            if (admin == null)
+            admin = new ApplicationUser
             {
-                admin = new ApplicationUser
+                Id = Guid.NewGuid(),
+                UserName = email,
+                Email = email,
+                Nombre = name,
+                FechaRegistroUtc = DateTime.UtcNow,
+                Activo = true
+            };
+
+            var c = await users.CreateAsync(admin, password);
+            if (!c.Succeeded)
+                throw new InvalidOperationException(string.Join(";", c.Errors.Select(x => x.Description)));
+        }
+        else
+        {
+            admin.Activo = true;
+            await users.UpdateAsync(admin);
+
+            // Restablecer contraseña para asegurar acceso garantizado con Admin1234#*
+            var token = await users.GeneratePasswordResetTokenAsync(admin);
+            await users.ResetPasswordAsync(admin, token, password);
+        }
+
+        if (!await users.IsInRoleAsync(admin, "Administrador"))
+        {
+            await users.AddToRoleAsync(admin, "Administrador");
+        }
+
+        // Asegurar que ÚNICAMENTE admin@huatulcotravel.com sea Administrador; los demás quedan como Cliente
+        var allAdmins = await users.GetUsersInRoleAsync("Administrador");
+        foreach (var otherAdmin in allAdmins)
+        {
+            if (!string.Equals(otherAdmin.Email, email, StringComparison.OrdinalIgnoreCase))
+            {
+                await users.RemoveFromRoleAsync(otherAdmin, "Administrador");
+                if (!await users.IsInRoleAsync(otherAdmin, "Cliente"))
                 {
-                    Id = Guid.NewGuid(),
-                    UserName = email.Trim(),
-                    Email = email.Trim(),
-                    Nombre = name,
-                    FechaRegistroUtc = DateTime.UtcNow,
-                    Activo = true
-                };
-
-                var c = await users.CreateAsync(admin, password);
-                if (!c.Succeeded)
-                    throw new InvalidOperationException(string.Join(";", c.Errors.Select(x => x.Description)));
+                    await users.AddToRoleAsync(otherAdmin, "Cliente");
+                }
             }
-
-            var a = await users.AddToRoleAsync(admin, "Administrador");
-            if (!a.Succeeded)
-                throw new InvalidOperationException(string.Join(";", a.Errors.Select(x => x.Description)));
         }
 
         // Sembrar alojamientos de muestra si la base de datos no tiene
