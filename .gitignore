@@ -10,6 +10,10 @@
 .vscode/
 
 ## Local configuration
+/appsettings.json
+config/database.php
+.vs/
+public/uploads/
 appsettings.Development.json
 appsettings.Local.json
 
