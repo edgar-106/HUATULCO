@@ -1,50 +1,63 @@
 # HuatulcoTravel — Plataforma de Hospedaje y Experiencias
 
-Plataforma moderna de reservas, hospedaje y experiencias turísticas en Bahías de Huatulco, Oaxaca. Desarrollada en **ASP.NET Core MVC (.NET 10)** con **PostgreSQL**, **Entity Framework Core**, **Three.js (WebGL 360°)** y **Leaflet con ArcGIS Satellite Imagery**.
+Plataforma integral de reservas, hospedaje y experiencias turísticas de lujo en Bahías de Huatulco, Oaxaca. Desarrollada en **ASP.NET Core MVC (.NET 10)** con **PostgreSQL**, **Entity Framework Core**, **Three.js (WebGL 360°)** y **Leaflet con ArcGIS Satellite Imagery**.
 
 ---
 
-## Características Principales
+## 🌟 Características Principales
 
-- **Landing Satelital Interactiva**:
-  - Vista aérea con animación de aproximación desde el espacio hasta las bahías de Huatulco vía Leaflet y ArcGIS Esri World Imagery.
-  - Marcadores de ubicación con anillos dorados pulsantes y popups con detalles, fotos y precios en vivo.
-  - Contador dinámico de residencias ubicadas y controles de mapa.
-- **Catálogo de Alojamientos Optimizado**:
-  - Tarjetas limpias con información esencial: tipo, capacidad, número de habitaciones, baños y tarifa (`MXN por noche`).
-  - Botón flotante **`📷 Fotos`**: Visor modal interactivo con carrusel, contador de fotografías y tira de miniaturas.
-  - Botón flotante **`🌐 Recorrido 3D`**: Visor panorámico 360° esférico con **Three.js** con rotación por arrastre/touch, zoom y cambio de ambientes (Sala, Recámara Master, Alberca con vista al mar).
-  - 8 alojamientos de muestra con coordenadas satelitales reales en Tangolunda, Chahué, Conejos, Santa Cruz, Bocana, Maguey y Arrocito.
-- **Ficha de Detalle de Alojamiento**:
-  - Imagen principal expandida a pantalla completa (hero banner) con acceso directo a fotos y recorrido 3D.
-  - Resumen de características, descripción completa y lista de servicios incluidos.
-  - Tarjeta lateral de reservación con precio por noche, disponibilidad y botón de solicitud vía WhatsApp.
-  - **Mapa Amplio con Navegación GPS**:
-    - Botón **`📍 Iniciar camino desde mi ubicación`**: Detecta tus coordenadas GPS reales, ubica tu marcador pulsante azul, traza la ruta directa sobre el mapa, calcula la distancia en km y tiempo estimado en auto, y ofrece el enlace a Google Maps en tiempo real.
-- **Diseño 100% Responsivo y Móvil (Mobile-First)**:
-  - Cabecera limpia y compacta en celulares con menú lateral desplegable tipo **Offcanvas** (estilo Airbnb).
-  - Gestos táctiles optimizados (`touch-action: none`) para rotar el 3D en smartphones sin interferir con el scroll.
-  - Compatible para navegarse desde cualquier celular en la misma red local Wi-Fi.
-- **Sistema de Autenticación y Cuentas (ASP.NET Core Identity)**:
-  - Registro seguro de clientes (`/Cuenta/Registro`).
-  - Inicio de sesión (`/Cuenta/Ingresar`) con protección contra ataques de fuerza bruta y bloqueo temporal.
-  - Roles definidos: `Administrador`, `Cliente`, `Operativo`, `Proveedor`.
-- **Panel de Administración (`/Admin/Alojamientos`)**:
-  - CRUD completo para gestionar residencias.
-  - Subida múltiple de fotografías (`JPG`, `PNG`, `WEBP`) con validación de magic bytes (máximo 5 MB por archivo).
-  - Baja lógica (*soft delete*) para proteger el historial de reservas y pagos.
+### 1. Landing Satelital Interactiva (WebGL & GIS)
+- **Vista Aérea y Zoom Satelital**: Animación fluida de aproximación desde el espacio hasta las 9 bahías de Huatulco utilizando **Leaflet** y satélite de alta resolución **ArcGIS Esri World Imagery**.
+- **Marcadores Pulsantes**: Coordenadas geográficas reales con anillos dorados pulsantes y ventanas modales de información, fotografías y tarifas en vivo.
+- **Contador Dinámico**: Métrica en tiempo real de propiedades activas en el mapa.
+
+### 2. Catálogo de Alojamientos y Experiencias 3D
+- **Tarjetas de Propiedad Responsivas**: Diseño limpio con capacidad de huéspedes, recámaras, baños y tarifa por noche en pesos mexicanos (MXN).
+- **Visor Fotográfico Modal (`📷 Fotos`)**: Carrusel interactivo con tira de miniaturas y contador de fotografías.
+- **Recorrido Virtual 360° (`🌐 Recorrido 3D`)**: Experiencia inmersiva esférica con **Three.js** con soporte táctil para rotar con el dedo en celulares, zoom y selector de ambientes (Sala principal, Recámara Máster, Alberca con vista al mar).
+- **Sembrado Inicial**: 8 propiedades de muestra con fotos reales y coordenadas en Tangolunda, Marina Chahué, Península Conejos, Santa Cruz, La Bocana, Bahía Maguey y Playa Arrocito.
+
+### 3. Ficha de Detalle y Navegación GPS en Tiempo Real
+- **Hero Banner Panorámico**: Portada con accesos directos flotantes a la galería y tour 3D.
+- **Distribución Móvil 2x2**: Especificaciones clave (Capacidad, Habitaciones, Baños y Tipo) estructuradas de forma simétrica para celulares.
+- **Tarjeta de Reservación Integrada**: Muestra el desglose de precios, disponibilidad y enlace directo de reservación por WhatsApp.
+- **Ruta GPS en Vivo**:
+  - Botón **`📍 Iniciar camino desde mi ubicación`**: Utiliza el GPS real de tu dispositivo para trazar una polilínea hacia la propiedad, calcular la distancia en kilómetros y el tiempo estimado en vehículo, con enlace a Google Maps.
+
+### 4. Panel de Administración de Lujo (`/Admin/Alojamientos`)
+- **Diseño Visual Huatulco Premium**: Interfaz moderna con la paleta de colores corporativa (tonos esmeralda, dorado y arena), lejos de formatos en texto plano.
+- **Tarjetas KPI**: Métricas inmediatas de total de residencias, porcentaje activo, tarifa promedio por noche y capacidad total de huéspedes.
+- **Tabla Responsiva de Control**: Miniaturas de imágenes, insignias de estado (*Publicado*, *Borrador*), especificaciones rápidas y botones de acción rápida (`👁️ Ver en web`, `✏️ Editar`, `🗑️ Desactivar`).
+- **Formularios Estructurados (`Crear` y `Editar`)**:
+  - Subida múltiple de fotografías (`JPG`, `PNG`, `WEBP`) con validación de magic bytes (máx. 5 MB por archivo).
+  - Configuración de coordenadas geográficas (Latitud y Longitud) para geolocalización en mapa satelital.
+  - Baja lógica (*soft delete*) para proteger el historial sin pérdida de datos.
+
+### 5. Control de Acceso y Roles (ASP.NET Core Identity)
+- **Administrador Único**: **Únicamente** la cuenta oficial `admin@huatulcotravel.com` posee el rol de `Administrador`.
+- **Registro Público de Clientes**: Todo usuario que se registre a través del sitio web recibe exclusivamente el rol de `Cliente` (visitante/huésped). Los clientes no tienen acceso al panel de administración.
+- **Protección contra Fuerza Bruta**: Bloqueo temporal configurable ante múltiples intentos fallidos de inicio de sesión.
 
 ---
 
-## Requisitos Previos
+## 🔐 Credenciales del Sistema
+
+| Rol | Correo Electrónico | Contraseña | Permisos |
+| :--- | :--- | :--- | :--- |
+| **Administrador Único** | `admin@huatulcotravel.com` | `Admin1234#*` | Acceso completo al Panel de Administración (`/Admin/Alojamientos`), creación, edición y baja de residencias. |
+| **Cliente / Visitante** | *(Cualquiera registrado en `/Cuenta/Registro`)* | *(La definida por el usuario)* | Exploración del catálogo, visualización de tours 3D, navegación GPS y solicitudes de reservación. |
+
+---
+
+## 🛠️ Requisitos Previos
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [PostgreSQL 15+](https://www.postgresql.org/download/) en ejecución local (puerto por defecto: `5432`).
+- [PostgreSQL 15+](https://www.postgresql.org/download/) en ejecución local (puerto estándar `5432`).
 - [Git](https://git-scm.com/)
 
 ---
 
-## Instrucciones para Ejecutar el Proyecto
+## 🚀 Guía de Instalación y Ejecución
 
 ### 1. Clonar el repositorio
 ```bash
@@ -58,83 +71,94 @@ Asegúrate de que el servicio de PostgreSQL esté activo. Crea la base de datos 
 CREATE DATABASE huatulco_travel_db;
 ```
 
-Revisa tu cadena de conexión en `appsettings.json`. Si tu contraseña de PostgreSQL es diferente a `postgres`, cámbiala:
+Verifica la cadena de conexión en `appsettings.json`. Si tu contraseña de PostgreSQL es diferente a `postgres`, cámbiala:
 ```json
 "ConnectionStrings": {
   "DefaultConnection": "Host=localhost;Port=5432;Database=huatulco_travel_db;Username=postgres;Password=TU_PASSWORD"
 }
 ```
 
-### 3. Aplicar las Migraciones y Sembrado de Datos
-Si no tienes la herramienta global de Entity Framework, instálala una sola vez:
+### 3. Aplicar Migraciones y Sembrado de Datos
+Si no tienes la herramienta de Entity Framework Core instalada globalmente:
 ```bash
 dotnet tool install --global dotnet-ef
 ```
 
-Aplica las migraciones para generar las tablas en PostgreSQL:
+Aplica las migraciones:
 ```bash
 dotnet ef database update
 ```
+*(Al iniciar por primera vez, el sistema ejecutará automáticamente `SeedData.cs`, creando el usuario administrador y las propiedades de muestra).*
 
-*(Al arrancar por primera vez, `SeedData.cs` insertará automáticamente los 8 alojamientos con sus fotos y el usuario administrador).*
-
-### 4. Iniciar la Aplicación en tu Computadora
+### 4. Iniciar el Servidor Web
 ```bash
 dotnet run
 ```
 
-La aplicación se iniciará y escuchará en todas las interfaces de red:
-- Desde tu PC: 👉 **http://localhost:5000**
-- Desde tu celular en la misma red Wi-Fi: 👉 **http://<TU_IP_LOCAL>:5000** (por ejemplo: `http://192.168.0.106:5000`)
+La aplicación se iniciará vinculada a todas las interfaces (`http://0.0.0.0:5000`):
+- **Desde tu PC**: 👉 [http://localhost:5000](http://localhost:5000)
+- **Desde tu Celular o Tablet en la misma red Wi-Fi**: 👉 `http://<TU_IP_LOCAL>:5000` (Ejemplo: `http://192.168.0.106:5000`)
 
 ---
 
-## Cómo Ver y Probar desde el Navegador de tu Celular
+## 📱 Cómo Probar el Sistema desde tu Celular
 
-1. Conecta tu celular a la **misma red Wi-Fi** que tu computadora.
-2. Averigua la dirección IP de tu computadora abriendo una terminal y ejecutando `ipconfig` (busca la línea *Dirección IPv4* en tu adaptador Wi-Fi, por ejemplo: `192.168.0.106`).
-3. En el navegador de tu celular (Chrome, Safari, etc.) entra a:
+1. Conecta tu teléfono a la **misma red Wi-Fi** que la computadora donde corre el proyecto.
+2. Obtén la IP local de tu PC ejecutando en PowerShell o CMD:
+   ```powershell
+   ipconfig
    ```
+   *(Busca el campo `Dirección IPv4` de tu adaptador Wi-Fi, por ejemplo: `192.168.0.106`).*
+3. Abre el navegador de tu celular (Google Chrome, Safari, Firefox) e ingresa:
+   ```text
    http://192.168.0.106:5000
    ```
-4. **Funcionalidades móviles destacadas**:
-   - Pulsa el botón de menú hamburguesa **`☰`** para abrir el panel lateral Offcanvas.
-   - Entra a cualquier alojamiento y prueba el **Recorrido 3D** deslizando con tu dedo sobre la pantalla táctil.
-   - Presiona **`📍 Iniciar camino desde mi ubicación`** en el mapa: tu teléfono usará su sensor GPS real para calcular la ruta exacta hacia la residencia.
+4. **Verificación de experiencia móvil**:
+   - **Menú Offcanvas**: Pulsa el botón de tres líneas `☰` en la esquina superior para acceder a todas las opciones de navegación sin desbordes.
+   - **Recorridos 3D táctiles**: Entra a cualquier residencia, presiona `🌐 Recorrido 3D Interactivo` y desliza tu dedo para explorar 360°.
+   - **Navegación GPS**: En la vista de detalle, pulsa `📍 Iniciar camino desde mi ubicación` y permite el acceso al GPS para trazar tu ruta a la playa.
+   - **Panel Admin**: Inicia sesión con `admin@huatulcotravel.com` / `Admin1234#*` para probar la gestión de alojamientos en diseño adaptativo.
 
 ---
 
-## Rutas y Acceso
+## 🗺️ Mapa de Rutas Principales
 
-| Sección | Ruta | Descripción |
+| Sección | Ruta URL | Roles Permitidos |
 | :--- | :--- | :--- |
-| **Inicio** | `/` | Landing con mapa satelital interactivo y estancias destacadas. |
-| **Catálogo** | `/Alojamientos` | Listado completo con filtros, fotos y recorridos 3D. |
-| **Detalle** | `/Alojamientos/Detalle/{id}` | Ficha completa, mapa grande y botón de ruta GPS. |
-| **Ingreso** | `/Cuenta/Ingresar` | Formulario de inicio de sesión. |
-| **Registro** | `/Cuenta/Registro` | Alta de nuevos clientes. |
-| **Panel Admin** | `/Admin/Alojamientos` | Gestión administrativa de propiedades (requiere rol `Administrador`). |
-
-### Credenciales del Administrador por Defecto:
-- **Correo**: `admin@huatulcotravel.com`
-- **Contraseña**: `Admin1234#*`
+| **Inicio / Landing** | `/` | Público (Todos) |
+| **Catálogo de Alojamientos** | `/Alojamientos` | Público (Todos) |
+| **Ficha de Detalle** | `/Alojamientos/Detalle/{id}` | Público (Todos) |
+| **Iniciar Sesión** | `/Cuenta/Ingresar` | Público (Todos) |
+| **Registro de Nuevos Clientes** | `/Cuenta/Registro` | Público (Todos) |
+| **Panel de Administración** | `/Admin/Alojamientos` | Solo `Administrador` |
+| **Registrar Nueva Propiedad** | `/Admin/Alojamientos/Crear` | Solo `Administrador` |
+| **Editar Propiedad** | `/Admin/Alojamientos/Editar/{id}` | Solo `Administrador` |
 
 ---
 
-## Arquitectura del Proyecto
+## 📂 Arquitectura de Directorios
 
 ```text
 HUATULCO/
 ├── Areas/
-│   └── Admin/            # Panel administrativo (Controladores y vistas CRUD)
-├── Controllers/          # Controladores públicos (HomeController, AlojamientosController, CuentaController)
-├── Data/                 # ApplicationDbContext, migraciones EF Core y SeedData
-├── Models/               # Entidades del dominio (Alojamiento, ImagenAlojamiento, etc.)
-├── Services/             # Lógica de negocio (AlojamientoService)
-├── ViewModels/           # Modelos de vista para formularios (Login, Registro, etc.)
-├── Views/                # Vistas Razor con diseño responsivo y Three.js 3D
-│   ├── Alojamientos/     # Catálogo Index y Detalle con mapa interactivo y GPS
-│   ├── Home/             # Landing satelital interactiva Leaflet / Esri
-│   └── Shared/           # _Layout con menú Offcanvas para móviles
-└── wwwroot/              # CSS (site.css), JavaScript y uploads de imágenes
+│   └── Admin/
+│       ├── Controllers/      # AlojamientosController (CRUD protegido por rol Administrador)
+│       └── Views/            # Vistas ejecutivas: Index, Crear y Editar con diseño de lujo
+├── Controllers/              # Controladores públicos (Home, Alojamientos, Cuenta)
+├── Data/                     # DbContext, migraciones EF Core y SeedData
+├── Models/                   # Entidades principales (Alojamiento, ImagenAlojamiento, ApplicationUser)
+├── Services/                 # Capa de servicios (AlojamientoService)
+├── ViewModels/               # Modelos para formularios validados (Login, Registro, AlojamientoForm)
+├── Views/                    # Vistas Razor con Bootstrap 5, Three.js y Leaflet
+│   ├── Alojamientos/         # Catálogo interactivo y Detalle con mapa GPS
+│   ├── Cuenta/               # Ingreso y Registro de usuarios
+│   ├── Home/                 # Landing interactiva con mapa satelital Esri
+│   └── Shared/               # _Layout principal con menú lateral Offcanvas
+└── wwwroot/
+    ├── css/site.css          # Estilos personalizados, tipografías y reglas responsive
+    └── uploads/              # Directorio de almacenamiento de imágenes cargadas
 ```
+
+---
+
+© 2026 HuatulcoTravel. Bahías de Huatulco, Oaxaca, México. Todos los derechos reservados.
