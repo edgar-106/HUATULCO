@@ -1,69 +1,212 @@
 @model AlojamientoFormViewModel
 @{
-    var esEdicion = Model.Id.HasValue;
-    ViewData["Title"] = esEdicion ? "Editar alojamiento" : "Nuevo alojamiento";
+    ViewData["Title"] = "Editar alojamiento - Panel de Administración";
+    var fotosExistentes = ViewBag.Imagenes as IEnumerable<ImagenAlojamiento>;
 }
-<div class="container py-5">
-    <h1 class="h2 fw-bold mb-4">@ViewData["Title"]</h1>
-    <form method="post" enctype="multipart/form-data" class="row g-3">
+
+<div class="section-wrap" style="padding-top: 36px; padding-bottom: 70px;">
+    <!-- Migas de Pan y Botón Volver -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0" style="font-size: 13px;">
+                <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index" style="color: var(--sea); text-decoration: none;">Inicio</a></li>
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Alojamientos" asp-action="Index" style="color: var(--sea); text-decoration: none;">Panel Admin</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Editar: @Model.Nombre</li>
+            </ol>
+        </nav>
+        <div class="d-flex gap-2">
+            <a asp-area="" asp-controller="Alojamientos" asp-action="Detalle" asp-route-id="@Model.Id" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1 fw-semibold text-nowrap" style="font-size: 12px;">
+                👁️ Ver en web
+            </a>
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-semibold text-nowrap" style="font-size: 12px;">
+                ← Volver al listado
+            </a>
+        </div>
+    </div>
+
+    <!-- Encabezado de la Página -->
+    <div class="mb-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="stay-tag position-static d-inline-block">EDICIÓN DE PROPIEDAD</span>
+            <span class="text-muted small">· ID: @Model.Id</span>
+        </div>
+        <h1 class="display-6 fw-bold mb-1" style="font-family: 'Playfair Display', serif; color: var(--deep);">
+            Editar: @Model.Nombre
+        </h1>
+        <p class="text-muted mb-0 small">
+            Modifica las tarifas, especificaciones, amenidades o añade nuevas fotografías a la galería de esta estancia.
+        </p>
+    </div>
+
+    <!-- Formulario Principal -->
+    <form method="post" enctype="multipart/form-data" class="needs-validation">
         @Html.AntiForgeryToken()
         <input asp-for="Id" type="hidden" />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="col-md-8">
-            <label asp-for="Nombre" class="form-label"></label>
-            <input asp-for="Nombre" class="form-control" />
-            <span asp-validation-for="Nombre" class="text-danger"></span>
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Tipo" class="form-label"></label>
-            <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoAlojamiento>()" class="form-select"></select>
-        </div>
-        <div class="col-12">
-            <label asp-for="Descripcion" class="form-label"></label>
-            <textarea asp-for="Descripcion" rows="4" class="form-control"></textarea>
-            <span asp-validation-for="Descripcion" class="text-danger"></span>
-        </div>
-        <div class="col-md-4">
-            <label asp-for="CapacidadHuespedes" class="form-label"></label>
-            <input asp-for="CapacidadHuespedes" class="form-control" />
-            <span asp-validation-for="CapacidadHuespedes" class="text-danger"></span>
-        </div>
-        <div class="col-md-4">
-            <label asp-for="NumeroHabitaciones" class="form-label"></label>
-            <input asp-for="NumeroHabitaciones" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="NumeroBanos" class="form-label"></label>
-            <input asp-for="NumeroBanos" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="PrecioBasePorNoche" class="form-label"></label>
-            <input asp-for="PrecioBasePorNoche" class="form-control" type="number" min="0.01" step="0.01" />
-            <span asp-validation-for="PrecioBasePorNoche" class="text-danger"></span>
-        </div>
-        <div class="col-md-8">
-            <label asp-for="Direccion" class="form-label"></label>
-            <input asp-for="Direccion" class="form-control" />
-        </div>
-        <div class="col-md-6">
-            <label asp-for="Latitud" class="form-label"></label>
-            <input asp-for="Latitud" class="form-control" type="number" step="any" />
-        </div>
-        <div class="col-md-6">
-            <label asp-for="Longitud" class="form-label"></label>
-            <input asp-for="Longitud" class="form-control" type="number" step="any" />
-        </div>
-        <div class="col-12"><label class="form-label" for="fotografias">Fotografías del alojamiento</label><input class="form-control" type="file" id="fotografias" name="fotografias" accept=".jpg,.jpeg,.png,.webp" multiple /><div class="form-text">JPG, PNG o WEBP; máximo 5 MB por imagen.</div></div>
-        <div class="col-md-6">
-            <label asp-for="Estado" class="form-label"></label>
-            <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoAlojamiento>()" class="form-select"></select>
-        </div>
-        <div class="col-12 d-flex gap-2 mt-4">
-            <button class="btn btn-primary" type="submit">Guardar alojamiento</button>
-            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-4 border-0 p-3 mb-4 small"></div>
+
+        <div class="row g-4">
+            <!-- Columna Izquierda: Información Principal y Capacidad -->
+            <div class="col-lg-8">
+                <!-- Tarjeta 1: Información General -->
+                <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-4 pb-2 border-bottom">
+                        <span class="fs-4">🏨</span>
+                        <h2 class="h5 fw-bold mb-0" style="color: var(--deep);">Información Principal</h2>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label asp-for="Nombre" class="form-label fw-semibold small text-muted">Nombre de la propiedad *</label>
+                            <input asp-for="Nombre" class="form-control form-control-lg rounded-3 fs-6" required />
+                            <span asp-validation-for="Nombre" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Tipo" class="form-label fw-semibold small text-muted">Tipo de estancia *</label>
+                            <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoAlojamiento>()" class="form-select form-select-lg rounded-3 fs-6"></select>
+                            <span asp-validation-for="Tipo" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Descripcion" class="form-label fw-semibold small text-muted">Descripción detallada *</label>
+                            <textarea asp-for="Descripcion" rows="5" class="form-control rounded-3" required></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2: Capacidad y Distribución -->
+                <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-4 pb-2 border-bottom">
+                        <span class="fs-4">📐</span>
+                        <h2 class="h5 fw-bold mb-0" style="color: var(--deep);">Capacidad y Espacios</h2>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-sm-4">
+                            <label asp-for="CapacidadHuespedes" class="form-label fw-semibold small text-muted">👥 Capacidad total *</label>
+                            <div class="input-group">
+                                <input asp-for="CapacidadHuespedes" type="number" min="1" max="50" class="form-control rounded-3" required />
+                                <span class="input-group-text bg-light text-muted small">pers.</span>
+                            </div>
+                            <span asp-validation-for="CapacidadHuespedes" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-4">
+                            <label asp-for="NumeroHabitaciones" class="form-label fw-semibold small text-muted">🛏️ Recámaras *</label>
+                            <div class="input-group">
+                                <input asp-for="NumeroHabitaciones" type="number" min="1" max="30" class="form-control rounded-3" required />
+                                <span class="input-group-text bg-light text-muted small">hab.</span>
+                            </div>
+                            <span asp-validation-for="NumeroHabitaciones" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-4">
+                            <label asp-for="NumeroBanos" class="form-label fw-semibold small text-muted">🚿 Baños completos *</label>
+                            <div class="input-group">
+                                <input asp-for="NumeroBanos" type="number" min="1" max="20" class="form-control rounded-3" required />
+                                <span class="input-group-text bg-light text-muted small">baños</span>
+                            </div>
+                            <span asp-validation-for="NumeroBanos" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3: Fotografías y Galería -->
+                <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-4 pb-2 border-bottom">
+                        <span class="fs-4">📷</span>
+                        <h2 class="h5 fw-bold mb-0" style="color: var(--deep);">Fotografías del Alojamiento</h2>
+                    </div>
+
+                    @if (fotosExistentes != null && fotosExistentes.Any())
+                    {
+                        <div class="mb-4">
+                            <span class="d-block text-muted small fw-bold text-uppercase mb-2">Fotos actualmente cargadas (@fotosExistentes.Count())</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var foto in fotosExistentes)
+                                {
+                                    <div class="position-relative rounded-3 overflow-hidden border shadow-sm" style="width: 100px; height: 75px; background: #e0e0e0;">
+                                        <img src="@foto.RutaArchivo" alt="@foto.TextoAlternativo" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted" for="fotografias">Agregar nuevas fotografías</label>
+                        <input class="form-control form-control-lg rounded-3" type="file" id="fotografias" name="fotografias" accept=".jpg,.jpeg,.png,.webp" multiple />
+                        <div class="form-text small mt-2">
+                            Formatos soportados: <strong>JPG, PNG o WEBP</strong>. Máximo 5 MB por archivo. Las nuevas fotos se sumarán a la galería existente.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Tarifa, Ubicación y Estado -->
+            <div class="col-lg-4">
+                <!-- Tarifa por Noche -->
+                <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                        <span class="fs-4">💰</span>
+                        <h2 class="h6 fw-bold mb-0" style="color: var(--deep);">Tarifa por Noche</h2>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PrecioBasePorNoche" class="form-label fw-semibold small text-muted">Precio base (MXN) *</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light fw-bold text-muted">$</span>
+                            <input asp-for="PrecioBasePorNoche" class="form-control fw-bold fs-5 text-dark" type="number" min="100" step="0.01" required />
+                            <span class="input-group-text bg-light small text-muted">MXN</span>
+                        </div>
+                        <span asp-validation-for="PrecioBasePorNoche" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-0">
+                        <label asp-for="Estado" class="form-label fw-semibold small text-muted">Estado de publicación</label>
+                        <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoAlojamiento>()" class="form-select rounded-3"></select>
+                    </div>
+                </div>
+
+                <!-- Ubicación y Coordenadas -->
+                <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                        <span class="fs-4">📍</span>
+                        <h2 class="h6 fw-bold mb-0" style="color: var(--deep);">Ubicación en Huatulco</h2>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Direccion" class="form-label fw-semibold small text-muted">Dirección o Referencia</label>
+                        <input asp-for="Direccion" class="form-control rounded-3" />
+                        <span asp-validation-for="Direccion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label asp-for="Latitud" class="form-label fw-semibold small text-muted">Latitud</label>
+                            <input asp-for="Latitud" class="form-control rounded-3" type="number" step="any" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Longitud" class="form-label fw-semibold small text-muted">Longitud</label>
+                            <input asp-for="Longitud" class="form-control rounded-3" type="number" step="any" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="p-4 rounded-4 bg-white border shadow-sm">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="button button-gold py-3 text-center fw-bold shadow-sm" style="border-radius: 50px;">
+                            ✓ Guardar Cambios
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill py-2 fw-semibold">
+                            Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

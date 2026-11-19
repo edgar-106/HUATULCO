@@ -1,4 +1,4 @@
-@model IEnumerable<Alojamiento>
+﻿@model IEnumerable<Alojamiento>
 @{
     ViewData["Title"] = "Alojamientos";
 }
@@ -38,16 +38,16 @@
                 
                 var fotosJson = System.Text.Json.JsonSerializer.Serialize(listaFotos);
 
-                <div class="stay-card" onclick="window.location.href='@Url.Action("Detalle", "Alojamientos", new { id = stay.Id })'">
+                <a href="@Url.Action("Detalle", "Alojamientos", new { id = stay.Id })" class="stay-card text-decoration-none" title="Ver información completa de @stay.Nombre">
                     <div class="stay-image" style="@bgStyle">
                         <span class="stay-tag">@stay.Tipo</span>
                         
                         <!-- Botones de Fotos y Recorrido 3D en la tarjeta -->
-                        <div class="card-floating-actions" onclick="event.stopPropagation();">
-                            <button type="button" class="btn-card-action" onclick="abrirGaleriaModal('@stay.Nombre', @fotosJson)" title="Ver fotos del alojamiento">
+                        <div class="card-floating-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                            <button type="button" class="btn-card-action" onclick="event.preventDefault(); event.stopPropagation(); abrirGaleriaModal('@stay.Nombre', @fotosJson)" title="Ver fotos del alojamiento">
                                 📷 Fotos
                             </button>
-                            <button type="button" class="btn-card-action" onclick="abrirTour3DModal('@stay.Nombre', '@stay.Tipo')" title="Abrir recorrido 3D interactivo">
+                            <button type="button" class="btn-card-action" onclick="event.preventDefault(); event.stopPropagation(); abrirTour3DModal('@stay.Nombre', '@stay.Tipo')" title="Abrir recorrido 3D interactivo">
                                 🌐 Recorrido 3D
                             </button>
                         </div>
@@ -64,7 +64,7 @@
                             <span class="text-link small" style="color: var(--sea); font-weight: 700;">Ver detalles ↗</span>
                         </div>
                     </div>
-                </div>
+                </a>
             }
         }
     </div>

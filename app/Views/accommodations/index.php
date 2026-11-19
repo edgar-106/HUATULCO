@@ -1,0 +1,10 @@
+<?php
+$e = static fn ($value) => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+?>
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Alojamientos | Huatulco</title><link rel="stylesheet" href="<?= $e($app['base_url']) ?>/assets/css/app.css"></head>
+<body><?php require __DIR__ . '/../shared/header.php'; ?>
+<main class="catalog section-wrap"><p class="eyebrow">ENCUENTRA TU ESTANCIA</p><h1>Alojamientos en Huatulco</h1><p class="catalog-lead">Explora las opciones disponibles y encuentra el espacio ideal para tu visita.</p><div class="stay-grid">
+<?php if ($accommodations === []): ?><article class="empty-card"><span class="empty-icon">⌂</span><h3>Estamos preparando el catálogo</h3><p>Pronto podrás explorar las propiedades disponibles en Huatulco.</p></article><?php else: foreach ($accommodations as $stay): ?>
+<article class="stay-card"><div class="stay-image" style="background-image:linear-gradient(180deg,transparent 55%,rgba(13,28,33,.6)),url('<?= $e($stay['cover_image'] ?: '') ?>')"><span class="stay-tag"><?= $e($stay['accommodation_type']) ?></span></div><div class="stay-info"><h3><a class="stay-detail-link" href="<?= $e($app['base_url']) ?>/alojamientos/detalle?id=<?= $e($stay['id']) ?>"><?= $e($stay['name']) ?></a></h3><p><?= $e($stay['neighborhood']) ?> · Hasta <?= $e($stay['capacity']) ?> huéspedes</p><strong>$<?= number_format((float) $stay['nightly_rate'], 0) ?> MXN <small>/ noche</small></strong></div></article>
+<?php endforeach; endif; ?></div></main><footer><a class="brand brand-footer" href="<?= $e($app['base_url']) ?>/">HUATULCO<small>ESTANCIAS & EXPERIENCIAS</small></a><p>Bahías de Huatulco, Oaxaca · México</p></footer></body></html>
