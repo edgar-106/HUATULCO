@@ -1,153 +1,166 @@
 # HuatulcoTravel — Plataforma de Hospedaje y Experiencias
 
-Plataforma moderna de reservas, hospedaje y experiencias turísticas en Bahías de Huatulco, Oaxaca. Desarrollada en **ASP.NET Core MVC (.NET 10)** con **PostgreSQL**, **Entity Framework Core**, **Three.js (WebGL 360°)** y **Leaflet con ArcGIS Satellite Imagery**.
+Plataforma de reservas, hospedaje y experiencias turísticas en Bahías de Huatulco, Oaxaca. Reimplementada en **PHP 8.2 + MySQL/MaríaDB**, HTML5, CSS y JavaScript vanilla, con mapa satelital (Leaflet + ArcGIS) y un panel administrativo completo para reservaciones, validación de pagos, eventos y transporte.
 
 ---
 
-## Características Principales
+## Características principales
 
-- **Landing Satelital Interactiva**:
-  - Vista aérea con animación de aproximación desde el espacio hasta las bahías de Huatulco vía Leaflet y ArcGIS Esri World Imagery.
-  - Marcadores de ubicación con anillos dorados pulsantes y popups con detalles, fotos y precios en vivo.
-  - Contador dinámico de residencias ubicadas y controles de mapa.
-- **Catálogo de Alojamientos Optimizado**:
-  - Tarjetas limpias con información esencial: tipo, capacidad, número de habitaciones, baños y tarifa (`MXN por noche`).
-  - Botón flotante **`📷 Fotos`**: Visor modal interactivo con carrusel, contador de fotografías y tira de miniaturas.
-  - Botón flotante **`🌐 Recorrido 3D`**: Visor panorámico 360° esférico con **Three.js** con rotación por arrastre/touch, zoom y cambio de ambientes (Sala, Recámara Master, Alberca con vista al mar).
-  - 8 alojamientos de muestra con coordenadas satelitales reales en Tangolunda, Chahué, Conejos, Santa Cruz, Bocana, Maguey y Arrocito.
-- **Ficha de Detalle de Alojamiento**:
-  - Imagen principal expandida a pantalla completa (hero banner) con acceso directo a fotos y recorrido 3D.
-  - Resumen de características, descripción completa y lista de servicios incluidos.
-  - Tarjeta lateral de reservación con precio por noche, disponibilidad y botón de solicitud vía WhatsApp.
-  - **Mapa Amplio con Navegación GPS**:
-    - Botón **`📍 Iniciar camino desde mi ubicación`**: Detecta tus coordenadas GPS reales, ubica tu marcador pulsante azul, traza la ruta directa sobre el mapa, calcula la distancia en km y tiempo estimado en auto, y ofrece el enlace a Google Maps en tiempo real.
-- **Diseño 100% Responsivo y Móvil (Mobile-First)**:
-  - Cabecera limpia y compacta en celulares con menú lateral desplegable tipo **Offcanvas** (estilo Airbnb).
-  - Gestos táctiles optimizados (`touch-action: none`) para rotar el 3D en smartphones sin interferir con el scroll.
-  - Compatible para navegarse desde cualquier celular en la misma red local Wi-Fi.
-- **Sistema de Autenticación y Cuentas (ASP.NET Core Identity)**:
-  - Registro seguro de clientes (`/Cuenta/Registro`).
-  - Inicio de sesión (`/Cuenta/Ingresar`) con protección contra ataques de fuerza bruta y bloqueo temporal.
-  - Roles definidos: `Administrador`, `Cliente`, `Operativo`, `Proveedor`.
-- **Panel de Administración (`/Admin/Reservaciones`)**: 
-  - Gestión de reservaciones de las residencias (habitaciones, departamentos y casas).
-  - Filtros por residencia y estado de reserva.
-  - Detalle de reserva con huésped, período, montos y actividades vinculadas.
-  - Cancelación de reservas y confirmación de reservas aprobadas.
-- **Validación de Pagos (`/Admin/Pagos`)**: 
-  - Revisión de comprobantes de pago (transferencias, depósitos, Oxxo, etc.) subidos por los clientes.
-  - Aprobación o rechazo del pago.
-  - Al aprobar: pago `Aprobado` y liberación de la reserva (casa) hacia el cliente (`Confirmada`).
-- **Control de Eventos (`/Admin/Eventos`)**: 
-  - Registro y clasificación de eventos: culturales, deportivos y sociales.
-  - Modalidad *fija* o *esporádica*.
-  - Vinculación de eventos con la residencia y el huésped.
-  - Coordinación con centros atractivos externos (proveedores de tours, paseos en lancha, etc.).
-- **Logística de Transporte (`/Admin/Transportes`)**: 
-  - Asignación de vehículo para traslados de huéspedes sin auto.
-  - Control de recogida, conducción y devolución.
+- **Landing satelital interactiva**: aproximación a las bahías de Huatulco con Leaflet y ArcGIS World Imagery, marcadores de las residencias y contador dinámico.
+- **Catálogo de alojamientos**: tarjetas con tipo, capacidad, recámaras, baños y tarifa por noche; galería de fotos y recorrido virtual.
+- **Ficha de detalle**: descripción, servicios, mapa, enlace GPS a Google Maps y botón **Reservar ahora**.
+- **Reservación en línea**:
+  - Formulario público con fechas, huéspedes y notas.
+  - Cálculo automático de noches, limpieza, impuestos (19 %) y total estimado.
+  - Folio único (`HT-AAAA-XXXXXX`) y apartado con vigencia configurable.
+  - Validación de disponibilidad para evitar traslapes.
+- **Comprobantes de pago**: el huésped sube JPG, PNG, WEBP o PDF (máximo 5 MB) y consulta el estado de su reservación por folio.
+- **Panel administrativo**:
+  - **Reservaciones**: filtros por residencia y estado, detalle del huésped, importes, confirmación manual, cancelación y accesos rápidos a eventos y transporte.
+  - **Pagos**: bandeja de comprobantes en revisión, visor seguro del archivo, aprobación (libera la residencia y confirma la reservación) o rechazo.
+  - **Eventos**: culturales, deportivos y sociales; fijos o esporádicos; vinculados a residencia, huésped y reservación; coordinación con centro de atracción y proveedor externo.
+  - **Transporte**: asignación de vehículo, placas, chofer, fechas de recogida/regreso y estado del servicio.
+  - **Alojamientos** y **Actividades**: CRUD y revisión de solicitudes existentes.
+- **Cuentas y seguridad**: registro e inicio de sesión con `password_hash`, bloqueo por intentos fallidos, roles (`guest`/`admin`), CSRF por token de sesión y comprobantes almacenados fuera de `public/`.
 
 ---
 
-## Requisitos Previos
+## Requisitos
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [PostgreSQL 15+](https://www.postgresql.org/download/) en ejecución local (puerto por defecto: `5432`).
-- [Git](https://git-scm.com/)
+- **PHP 8.2+** con las extensiones `pdo_mysql`, `fileinfo` y `mbstring` (incluidas en XAMPP).
+- **MySQL 8** o **MariaDB 10.4+** (XAMPP incluye MariaDB).
+- **Git** (opcional).
+
+En este equipo PHP está en `C:\xampp\php\php.exe` y MySQL/MaríaDB escucha en `127.0.0.1:3306` con usuario `root` sin contraseña.
 
 ---
 
-## Instrucciones para Ejecutar el Proyecto
+## Instalación y ejecución
 
 ### 1. Clonar el repositorio
+
 ```bash
 git clone https://github.com/edgar-106/HUATULCO.git
 cd HUATULCO
 ```
 
-### 2. Configurar la Base de Datos
-Asegúrate de que el servicio de PostgreSQL esté activo. Crea la base de datos desde `psql` o `pgAdmin`:
-```sql
-CREATE DATABASE huatulco_travel_db;
-```
+### 2. Configurar la base de datos
 
-Revisa tu cadena de conexión en `appsettings.json`. Si tu contraseña de PostgreSQL es diferente a `postgres`, cámbiala:
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Port=5432;Database=huatulco_travel_db;Username=postgres;Password=TU_PASSWORD"
-}
-```
+Copia la plantilla y ajusta tus credenciales si es necesario:
 
-### 3. Aplicar las Migraciones y Sembrado de Datos
-Si no tienes la herramienta global de Entity Framework, instálala una sola vez:
 ```bash
-dotnet tool install --global dotnet-ef
+copy config\database.example.php config\database.php
 ```
 
-Aplica las migraciones para generar las tablas en PostgreSQL:
-```bash
-dotnet ef database update
+Contenido esperado:
+
+```php
+return [
+    'host' => '127.0.0.1',
+    'port' => 3306,
+    'database' => 'huatulco',
+    'username' => 'root',
+    'password' => '',
+    'charset' => 'utf8mb4',
+];
 ```
 
-*(Al arrancar por primera vez, `SeedData.cs` insertará automáticamente los 8 alojamientos con sus fotos y el usuario administrador).*
+### 3. Crear el esquema, datos demo y usuarios
 
-### 4. Iniciar la Aplicación en tu Computadora
-```bash
-dotnet run
+```powershell
+C:\xampp\php\php.exe scripts\setup.php
 ```
 
-La aplicación se iniciará y escuchará en todas las interfaces de red:
-- Desde tu PC: 👉 **http://localhost:5000**
-- Desde tu celular en la misma red Wi-Fi: 👉 **http://<TU_IP_LOCAL>:5000** (por ejemplo: `http://192.168.0.106:5000`)
+El script crea la base `huatulco`, importa `database/schema.sql`, `demo.sql` y `catalog.sql`, y siembra las cuentas de acceso. Si ya existe la base, solo aplica cambios pendientes y conserva los datos.
+
+### 4. Iniciar el servidor
+
+```powershell
+C:\xampp\php\php.exe -d upload_max_filesize=5M -d post_max_size=32M -S 127.0.0.1:8080 -t public scripts/dev-router.php
+```
+
+O simplemente:
+
+```powershell
+.\iniciar.ps1
+```
+
+Abre **http://127.0.0.1:8080**.
+
+Para probar desde un celular en la misma red Wi-Fi:
+
+```powershell
+.\iniciar.ps1 -EnRedLocal
+```
+
+y visita `http://<TU_IP_LOCAL>:8080`.
 
 ---
 
-## Cómo Ver y Probar desde el Navegador de tu Celular
+## Credenciales de demostración
 
-1. Conecta tu celular a la **misma red Wi-Fi** que tu computadora.
-2. Averigua la dirección IP de tu computadora abriendo una terminal y ejecutando `ipconfig` (busca la línea *Dirección IPv4* en tu adaptador Wi-Fi, por ejemplo: `192.168.0.106`).
-3. En el navegador de tu celular (Chrome, Safari, etc.) entra a:
-   ```
-   http://192.168.0.106:5000
-   ```
-4. **Funcionalidades móviles destacadas**:
-   - Pulsa el botón de menú hamburguesa **`☰`** para abrir el panel lateral Offcanvas.
-   - Entra a cualquier alojamiento y prueba el **Recorrido 3D** deslizando con tu dedo sobre la pantalla táctil.
-   - Presiona **`📍 Iniciar camino desde mi ubicación`** en el mapa: tu teléfono usará su sensor GPS real para calcular la ruta exacta hacia la residencia.
+| Rol | Correo | Contraseña |
+| :--- | :--- | :--- |
+| Administrador | `admin@huatulcotravel.com` | `Admin1234#*` |
+| Cliente | `cliente@huatulcotravel.com` | `Cliente1234#*` |
+
+Al iniciar sesión como administrador se abre directamente `/admin/reservaciones`.
 
 ---
 
-## Rutas y Acceso
+## Rutas principales
 
 | Sección | Ruta | Descripción |
 | :--- | :--- | :--- |
-| **Inicio** | `/` | Landing con mapa satelital interactivo y estancias destacadas. |
-| **Catálogo** | `/Alojamientos` | Listado completo con filtros, fotos y recorridos 3D. |
-| **Detalle** | `/Alojamientos/Detalle/{id}` | Ficha completa, mapa grande y botón de ruta GPS. |
-| **Ingreso** | `/Cuenta/Ingresar` | Formulario de inicio de sesión. |
-| **Registro** | `/Cuenta/Registro` | Alta de nuevos clientes. |
-| **Panel Admin** | `/Admin/Reservaciones` | Panel administrativo de reservaciones, pagos, eventos y transporte (requiere rol `Administrador`). |
-
-### Credenciales del Administrador por Defecto:
-- **Correo**: `admin@huatulcotravel.com`
-- **Contraseña**: `Admin1234#*`
+| Inicio | `/` | Landing con mapa satelital y estancias destacadas. |
+| Alojamientos | `/alojamientos` | Catálogo completo. |
+| Detalle | `/alojamientos/detalle?id=1` | Ficha del alojamiento. |
+| Reservar | `/alojamientos/reservar?id=1` | Formulario público de reservación. |
+| Estado de reserva | `/reservas?folio=HT-2026-XXXXXX` | Detalle, instrucciones y carga de comprobante. |
+| Mis reservas | `/mis-reservas` | Reservaciones de la cuenta autenticada. |
+| Cuenta | `/cuenta/ingresar` · `/cuenta/registro` | Acceso y alta de clientes. |
+| Panel: reservaciones | `/admin/reservaciones` | Listado, filtros y detalle. |
+| Panel: pagos | `/admin/pagos` | Aprobar o rechazar comprobantes. |
+| Panel: eventos | `/admin/eventos` | CRUD y coordinación externa. |
+| Panel: transporte | `/admin/transportes` | Asignación logística. |
+| Panel: alojamientos | `/admin/alojamientos` | CRUD de propiedades. |
+| Panel: actividades | `/admin/actividades` | Catálogo y solicitudes. |
 
 ---
 
-## Arquitectura del Proyecto
+## Estructura del proyecto
 
 ```text
 HUATULCO/
-├── Areas/
-│   └── Admin/            # Panel administrativo (Controladores y vistas CRUD)
-├── Controllers/          # Controladores públicos (HomeController, AlojamientosController, CuentaController)
-├── Data/                 # ApplicationDbContext, migraciones EF Core y SeedData
-├── Models/               # Entidades del dominio (Alojamiento, ImagenAlojamiento, etc.)
-├── Services/             # Lógica de negocio (AlojamientoService)
-├── ViewModels/           # Modelos de vista para formularios (Login, Registro, etc.)
-├── Views/                # Vistas Razor con diseño responsivo y Three.js 3D
-│   ├── Alojamientos/     # Catálogo Index y Detalle con mapa interactivo y GPS
-│   ├── Home/             # Landing satelital interactiva Leaflet / Esri
-│   └── Shared/           # _Layout con menú Offcanvas para móviles
-└── wwwroot/              # CSS (site.css), JavaScript y uploads de imágenes
+├── app/
+│   ├── Controllers/          # Controladores públicos y Admin/
+│   ├── Core/                 # Router, Database (PDO), Controller base
+│   ├── Models/               # Reservation, Payment, Event, Transport, etc.
+│   └── Views/                # Vistas PHP (HTML + CSS)
+├── config/
+│   ├── app.php               # Nombre, zona horaria, vigencia de apartado
+│   └── database.example.php  # Plantilla de conexión MySQL
+├── database/
+│   ├── schema.sql            # Tablas, columnas y estados
+│   ├── demo.sql              # Alojamientos y actividades de muestra
+│   └── catalog.sql           # Catálogo complementario
+├── public/
+│   ├── index.php             # Punto de entrada
+│   └── assets/               # CSS e imágenes
+├── routes/web.php            # Registro de rutas
+├── scripts/
+│   ├── setup.php             # Instalación de BD y usuarios
+│   └── dev-router.php        # Router para el servidor embebido de PHP
+├── storage/receipts/         # Comprobantes privados (generado, no versionado)
+└── iniciar.ps1               # Arranque rápido en Windows
 ```
+
+---
+
+## Notas de operación
+
+- Los comprobantes se guardan en `storage/receipts/AAAA/MM/` y solo se sirven a administradores mediante `/admin/pagos/comprobante?id=…`; nunca se exponen en `public/`.
+- Aprobar un pago cambia el comprobante a **Aprobado**, confirma la reservación y libera la residencia. Rechazarlo permite al huésped subir un nuevo archivo.
+- El apartado vence según `reservation_hold_days` en `config/app.php` (3 días por defecto); las fechas ocupadas por apartados vencidos quedan disponibles de nuevo.
+- Los importes se calculan como: noches × tarifa + limpieza + 19 % de impuestos (16 % IVA + 3 % hospedaje).
+- `config/database.php`, `storage/` y `public/uploads/` están excluidos de Git.

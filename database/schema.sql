@@ -200,3 +200,63 @@ ALTER TABLE activity_requests
     ADD COLUMN IF NOT EXISTS requested_time TIME NULL,
     ADD COLUMN IF NOT EXISTS adults SMALLINT UNSIGNED NULL,
     ADD COLUMN IF NOT EXISTS children SMALLINT UNSIGNED NULL;
+
+-- ============================================================
+-- Módulo administrativo: reservaciones, pagos, eventos y transporte
+-- ============================================================
+
+ALTER TABLE reservations
+    ADD COLUMN IF NOT EXISTS folio VARCHAR(30) NULL AFTER id,
+    ADD COLUMN IF NOT EXISTS guest_phone VARCHAR(30) NULL AFTER guest_email,
+    ADD COLUMN IF NOT EXISTS notes VARCHAR(500) NULL;
+
+ALTER TABLE reservations MODIFY COLUMN status
+    ENUM('pending_payment', 'payment_submitted', 'confirmed', 'rejected', 'cancelled', 'expired')
+    NOT NULL DEFAULT 'pending_payment';
+
+ALTER TABLE payment_receipts MODIFY COLUMN payment_method
+    ENUM('transfer', 'cash_deposit', 'oxxo', 'other') NOT NULL DEFAULT 'other';
+
+ALTER TABLE payment_receipts
+    ADD COLUMN IF NOT EXISTS original_name VARCHAR(190) NULL,
+    ADD COLUMN IF NOT EXISTS mime_type VARCHAR(100) NULL,
+    ADD COLUMN IF NOT EXISTS size_bytes BIGINT UNSIGNED NULL;
+
+CREATE TABLE IF NOT EXISTS events (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    accommodation_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NULL,
+    reservation_id BIGINT UNSIGNED NULL,
+    name VARCHAR(160) NOT NULL,
+    event_type ENUM('cultural', 'deportivo', 'social') NOT NULL DEFAULT 'cultural',
+    is_sporadic BOOLEAN NOT NULL DEFAULT FALSE,
+    event_date DATE NOT NULL,
+    description TEXT NULL,
+    attraction_center VARCHAR(160) NULL,
+    provider VARCHAR(160) NULL,
+    status ENUM('scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'scheduled',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_events_accommodation_date (accommodation_id, event_date),
+    INDEX idx_events_status (status, event_date),
+    CONSTRAINT fk_event_accommodation FOREIGN KEY (accommodation_id) REFERENCES accommodations(id),
+    CONSTRAINT fk_event_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_event_reservation FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS transports (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reservation_id BIGINT UNSIGNED NOT NULL,
+    reason VARCHAR(160) NOT NULL,
+    vehicle_type VARCHAR(80) NOT NULL,
+    plates VARCHAR(20) NULL,
+    driver VARCHAR(160) NULL,
+    pickup_date DATE NULL,
+    return_date DATE NULL,
+    notes VARCHAR(500) NULL,
+    status ENUM('assigned', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'assigned',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_transports_reservation (reservation_id),
+    INDEX idx_transports_status (status, pickup_date),
+    CONSTRAINT fk_transport_reservation FOREIGN KEY (reservation_id) REFERENCES reservations(id)
+) ENGINE=InnoDB;
+

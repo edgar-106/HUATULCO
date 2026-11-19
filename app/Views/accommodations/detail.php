@@ -40,6 +40,7 @@
             <aside>
                 <h2>Tarifa por noche</h2>
                 <p><strong>$<?= number_format((float) $stay['nightly_rate'], 2) ?> MXN</strong></p>
+                <a class="button button-gold" href="<?= $e($app['base_url']) ?>/alojamientos/reservar?id=<?= $e($stay['id']) ?>">Reservar ahora</a>
                 <?php if ($stay['virtual_tour_url'] && in_array(parse_url($stay['virtual_tour_url'], PHP_URL_SCHEME), ['https', 'http'], true)): ?>
                     <a class="button button-dark" href="<?= $e($stay['virtual_tour_url']) ?>">Ver recorrido virtual</a>
                 <?php endif; ?>

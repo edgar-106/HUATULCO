@@ -100,6 +100,6 @@ final class AccountController extends Controller
         unset($_SESSION['token']);
         $_SESSION['user_id'] = $id;
         $_SESSION['role'] = $role;
-        $this->redirect($role === 'admin' ? '/admin/alojamientos' : '/');
+        $this->redirect($role === 'admin' ? '/admin/reservaciones' : '/');
     }
 }

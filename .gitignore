@@ -16,3 +16,8 @@ appsettings.Local.json
 ## Logs
 logs/
 *.log
+
+## Configuración local y archivos generados
+config/database.php
+storage/
+public/uploads/

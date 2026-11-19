@@ -37,6 +37,19 @@ try {
         }
         $result->closeCursor();
     }
+
+    $pdo->exec('USE `' . $database . '`');
+    $seedUsers = [
+        ['Administrador Huatulco', 'admin@huatulcotravel.com', 'Admin1234#*', 'admin'],
+        ['Cliente Demo', 'cliente@huatulcotravel.com', 'Cliente1234#*', 'guest'],
+    ];
+    $insertUser = $pdo->prepare('INSERT IGNORE INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)');
+    foreach ($seedUsers as [$name, $email, $password, $role]) {
+        $insertUser->execute([$name, $email, password_hash($password, PASSWORD_DEFAULT), $role]);
+    }
+    $pdo->prepare("UPDATE users SET role = 'admin' WHERE email = ? AND role <> 'admin'")
+        ->execute(['admin@huatulcotravel.com']);
+
     echo "Base de datos lista.\n";
 } catch (PDOException $exception) {
     $code = (int) ($exception->errorInfo[1] ?? 0);

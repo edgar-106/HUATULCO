@@ -6,6 +6,12 @@ $siteNav = [
 if (!empty($showRequestsLink)) {
     $siteNav[] = ['#mis-solicitudes', 'Mis solicitudes'];
 }
+if (isset($_SESSION['user_id'])) {
+    $siteNav[] = [$app['base_url'] . '/mis-reservas', 'Mis reservas'];
+}
+if (($_SESSION['role'] ?? '') === 'admin') {
+    $siteNav[] = [$app['base_url'] . '/admin/reservaciones', 'Panel Admin'];
+}
 $accountLabel = isset($_SESSION['user_id']) ? 'Mi cuenta' : ($copy['nav_login'] ?? 'Ingresar');
 ?>
 <header class="site-header responsive-site-header">

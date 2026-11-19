@@ -20,9 +20,14 @@
         <p class="eyebrow">ACCESO A TU CUENTA</p>
         <?php if ($signedIn): ?>
             <h1 id="account-title">Mi cuenta</h1>
-            <p class="account-intro">Consulta tus solicitudes de actividades en Huatulco.</p>
-            <p><a class="account-link" href="<?= $e($app['base_url']) ?>/actividades#mis-solicitudes">Mis solicitudes</a></p>
+            <p class="account-intro">Consulta tus reservaciones y solicitudes de actividades en Huatulco.</p>
+            <p><a class="account-link" href="<?= $e($app['base_url']) ?>/mis-reservas">Mis reservas</a></p>
+            <p><a class="account-link" href="<?= $e($app['base_url']) ?>/actividades#mis-solicitudes">Mis solicitudes de actividades</a></p>
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+                <p><a class="account-link" href="<?= $e($app['base_url']) ?>/admin/reservaciones">Administrar reservaciones</a></p>
+                <p><a class="account-link" href="<?= $e($app['base_url']) ?>/admin/pagos">Validar pagos</a></p>
+                <p><a class="account-link" href="<?= $e($app['base_url']) ?>/admin/eventos">Administrar eventos</a></p>
+                <p><a class="account-link" href="<?= $e($app['base_url']) ?>/admin/transportes">Logística de transporte</a></p>
                 <p><a class="account-link" href="<?= $e($app['base_url']) ?>/admin/alojamientos">Administrar alojamientos</a></p>
                 <p><a class="account-link" href="<?= $e($app['base_url']) ?>/admin/actividades">Administrar actividades</a></p>
             <?php endif; ?>
