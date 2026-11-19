@@ -205,6 +205,69 @@ namespace HuatulcoTravel.Migrations
                     b.ToTable("ComprobantesPago");
                 });
 
+            modelBuilder.Entity("HuatulcoTravel.Models.Evento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AlojamientoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CentroAtractivo")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<bool>("EsSporadico")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly>("Fecha")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("FechaActualizacionUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaCreacionUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Proveedor")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<Guid?>("ReservacionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("UsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservacionId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.HasIndex("AlojamientoId", "Fecha");
+
+                    b.ToTable("Evento");
+                });
+
             modelBuilder.Entity("HuatulcoTravel.Models.ImagenAlojamiento", b =>
                 {
                     b.Property<Guid>("Id")
@@ -366,6 +429,56 @@ namespace HuatulcoTravel.Migrations
                         });
                 });
 
+            modelBuilder.Entity("HuatulcoTravel.Models.Transporte", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Conductor")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("FechaCreacionUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly?>("FechaDevolucion")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("FechaRecogida")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Notas")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Placas")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<Guid>("ReservacionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("VehiculoTipo")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservacionId");
+
+                    b.ToTable("Transporte");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -507,6 +620,31 @@ namespace HuatulcoTravel.Migrations
                     b.Navigation("Pago");
                 });
 
+            modelBuilder.Entity("HuatulcoTravel.Models.Evento", b =>
+                {
+                    b.HasOne("HuatulcoTravel.Models.Alojamiento", "Alojamiento")
+                        .WithMany()
+                        .HasForeignKey("AlojamientoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HuatulcoTravel.Models.Reservacion", "Reservacion")
+                        .WithMany("Eventos")
+                        .HasForeignKey("ReservacionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("HuatulcoTravel.Models.ApplicationUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Alojamiento");
+
+                    b.Navigation("Reservacion");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("HuatulcoTravel.Models.ImagenAlojamiento", b =>
                 {
                     b.HasOne("HuatulcoTravel.Models.Alojamiento", "Alojamiento")
@@ -521,7 +659,7 @@ namespace HuatulcoTravel.Migrations
             modelBuilder.Entity("HuatulcoTravel.Models.Pago", b =>
                 {
                     b.HasOne("HuatulcoTravel.Models.Reservacion", "Reservacion")
-                        .WithMany()
+                        .WithMany("Pagos")
                         .HasForeignKey("ReservacionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -544,6 +682,17 @@ namespace HuatulcoTravel.Migrations
                     b.Navigation("Alojamiento");
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("HuatulcoTravel.Models.Transporte", b =>
+                {
+                    b.HasOne("HuatulcoTravel.Models.Reservacion", "Reservacion")
+                        .WithMany("Transportes")
+                        .HasForeignKey("ReservacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservacion");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -605,6 +754,15 @@ namespace HuatulcoTravel.Migrations
             modelBuilder.Entity("HuatulcoTravel.Models.Pago", b =>
                 {
                     b.Navigation("Comprobantes");
+                });
+
+            modelBuilder.Entity("HuatulcoTravel.Models.Reservacion", b =>
+                {
+                    b.Navigation("Eventos");
+
+                    b.Navigation("Pagos");
+
+                    b.Navigation("Transportes");
                 });
 #pragma warning restore 612, 618
         }

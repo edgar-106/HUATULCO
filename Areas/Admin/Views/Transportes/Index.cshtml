@@ -1,0 +1,58 @@
+@model IEnumerable<HuatulcoTravel.Models.Transporte>
+@{
+    ViewData["Title"] = "Logística de transporte";
+}
+
+<section class="section-wrap" style="padding-top: 48px;">
+    <div class="section-heading mb-4">
+        <div>
+            <p class="eyebrow">PANEL ADMINISTRATIVO</p>
+            <h2>Logística de transporte</h2>
+        </div>
+        <a class="button button-gold" asp-area="Admin" asp-controller="Transportes" asp-action="Crear">
+            <span>+</span> Nueva asignación
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-card">
+            <span class="empty-icon">🚐</span>
+            <h3>Sin transportes asignados</h3>
+            <p>No hay asignaciones de vehículo registradas.</p>
+        </div>
+    }
+
+    <div class="table-responsive rounded-4 border bg-white shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Motivo</th>
+                    <th>Reserva</th>
+                    <th>Vehículo</th>
+                    <th>Conductor</th>
+                    <th>Estado</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model)
+                {
+                    <tr>
+                        <td><strong>@t.Motivo</strong></td>
+                        <td>@(t.Reservacion?.Folio ?? "Sin reserva")</td>
+                        <td>@t.VehiculoTipo @(string.IsNullOrWhiteSpace(t.Placas) ? "" : $"· Placas: {t.Placas}")</td>
+                        <td>@(string.IsNullOrWhiteSpace(t.Conductor) ? "Por asignar" : t.Conductor)</td>
+                        <td><span class="badge bg-secondary">@t.Estado</span></td>
+                        <td class="text-end">
+                            <form method="post" asp-area="Admin" asp-controller="Transportes" asp-action="Eliminar" class="d-inline" onsubmit="return confirm('¿Eliminar esta asignación de transporte?');">
+                                <input type="hidden" name="id" value="@t.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

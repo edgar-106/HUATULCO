@@ -55,4 +55,10 @@ public class Reservacion
 
     [Timestamp]
     public uint Version { get; set; }
+
+    public ICollection<Pago> Pagos { get; set; } = new List<Pago>();
+
+    public ICollection<Evento> Eventos { get; set; } = new List<Evento>();
+
+    public ICollection<Transporte> Transportes { get; set; } = new List<Transporte>();
 }

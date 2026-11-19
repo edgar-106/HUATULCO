@@ -1,0 +1,95 @@
+@model IEnumerable<HuatulcoTravel.Models.Reservacion>
+@{
+    ViewData["Title"] = "Reservaciones";
+    var alojamientos = (IEnumerable<HuatulcoTravel.Models.Alojamiento>)ViewData["Alojamientos"];
+    var alojamientoSel = ViewData["AlojamientoId"] as Guid?;
+    var estadoSel = ViewData["Estado"] as HuatulcoTravel.Models.EstadoReservacion?;
+}
+
+<section class="section-wrap" style="padding-top: 48px;">
+    <div class="section-heading mb-4">
+        <div>
+            <p class="eyebrow">PANEL ADMINISTRATIVO</p>
+            <h2>Reservaciones</h2>
+        </div>
+        <a class="button button-gold" asp-area="Admin" asp-controller="Eventos" asp-action="Crear">
+            <span>+</span> Nueva actividad
+        </a>
+    </div>
+
+    <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold" for="fAlojamiento">Residencia</label>
+                <select name="AlojamientoId" id="fAlojamiento" class="form-select">
+                    <option value="">Todas las residencias</option>
+                    @foreach (var a in alojamientos)
+                    {
+                        <option value="@a.Id" selected="@(alojamientoSel.HasValue && a.Id == alojamientoSel)">@a.Nombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold" for="fEstado">Estado</label>
+                <select name="Estado" id="fEstado" class="form-select">
+                    <option value="">Todos</option>
+                    @foreach (var e in Enum.GetValues<HuatulcoTravel.Models.EstadoReservacion>())
+                    {
+                        <option value="@e" selected="@(estadoSel.HasValue && e == estadoSel)">@e</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+                <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Reservaciones" asp-action="Index">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-card">
+            <span class="empty-icon">📭</span>
+            <h3>Sin reservaciones</h3>
+            <p>No hay reservaciones registradas con los filtros seleccionados.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive rounded-4 border bg-white shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Folio</th>
+                        <th>Residencia</th>
+                        <th>Huésped</th>
+                        <th>Contacto</th>
+                        <th>Periodo</th>
+                        <th class="text-end">Total</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td><strong>@r.Folio</strong></td>
+                            <td>@(r.Alojamiento?.Nombre ?? "Sin residencia")</td>
+                            <td>@r.NombreHuesped</td>
+                            <td>@r.EmailHuesped</td>
+                            <td>@r.FechaEntrada → @r.FechaSalida</td>
+                            <td class="text-end">@r.Total.ToString("C")</td>
+                            <td>
+                                <span class="badge bg-secondary">@r.Estado</span>
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" asp-area="Admin" asp-controller="Reservaciones" asp-action="Detalle" asp-route-id="@r.Id">Ver</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

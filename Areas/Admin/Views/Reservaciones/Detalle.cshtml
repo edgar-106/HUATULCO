@@ -1,0 +1,175 @@
+@model HuatulcoTravel.Models.Reservacion
+@{
+    ViewData["Title"] = "Detalle de reserva";
+}
+
+<section class="section-wrap" style="padding-top: 48px;">
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
+        <nav aria-label="breadcrumb" class="overflow-hidden">
+            <ol class="breadcrumb mb-0 text-nowrap" style="font-size: 13px;">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Reservaciones" asp-action="Index" style="color: var(--sea); text-decoration: none;">Reservaciones</a></li>
+                <li class="breadcrumb-item active text-muted" style="max-width: 320px;" aria-current="page">@Model.Folio</li>
+            </ol>
+        </nav>
+        <a class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap flex-shrink-0" style="font-size: 12px; font-weight: 600;" asp-area="Admin" asp-controller="Reservaciones" asp-action="Index">
+            ← Volver a reservas
+        </a>
+    </div>
+
+    <div class="section-heading mb-4">
+        <div>
+            <p class="eyebrow">PANEL ADMINISTRATIVO</p>
+            <h2>Reserva @Model.Folio</h2>
+        </div>
+        <span class="badge bg-secondary fs-6">@Model.Estado</span>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+                <h3 class="h5 fw-bold mb-3">Huésped</h3>
+                <div class="row">
+                    <div class="col-md-4"><span class="text-muted small d-block">Nombre</span><strong>@Model.NombreHuesped</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Correo</span><strong>@Model.EmailHuesped</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Teléfono</span><strong>@Model.TelefonoHuesped</strong></div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4"><span class="text-muted small d-block">Residencia</span><strong>@(Model.Alojamiento?.Nombre ?? "Sin residencia")</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Dirección</span><strong>@(string.IsNullOrWhiteSpace(Model.Alojamiento?.Direccion) ? "Bahías de Huatulco" : Model.Alojamiento!.Direccion)</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Tipo</span><strong>@Model.Alojamiento?.Tipo</strong></div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4"><span class="text-muted small d-block">Entrada</span><strong>@Model.FechaEntrada</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Salida</span><strong>@Model.FechaSalida</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Huéspedes</span><strong>@Model.NumeroHuespedes</strong></div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4"><span class="text-muted small d-block">Subtotal</span><strong>@Model.Subtotal.ToString("C")</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Cargo limpieza</span><strong>@Model.CargoLimpieza.ToString("C")</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Total</span><strong>@Model.Total.ToString("C")</strong></div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4"><span class="text-muted small d-block">Incluye limpieza</span><strong>@(Model.IncluyeLimpieza ? "Sí" : "No")</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Registrada</span><strong>@Model.FechaCreacionUtc</strong></div>
+                    <div class="col-md-4"><span class="text-muted small d-block">Folio</span><strong>@Model.Folio</strong></div>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+                <h3 class="h5 fw-bold mb-3">Pagos</h3>
+                @if (Model.Pagos == null || !Model.Pagos.Any())
+                {
+                    <p class="text-muted small mb-0">Sin pagos registrados.</p>
+                }
+                else
+                {
+                    foreach (var pago in Model.Pagos)
+                    {
+                        <div class="p-3 rounded-3 bg-light border mb-2">
+                            <div class="d-flex justify-content-between align-items-baseline">
+                                <strong>@pago.Metodo</strong>
+                                <strong>@pago.Importe.ToString("C")</strong>
+                            </div>
+                            <span class="text-muted small">Estado: @pago.Estado · Registrado: @pago.FechaRegistroUtc</span>
+                            @if (pago.Comprobantes != null && pago.Comprobantes.Any())
+                            {
+                                <div class="mt-2">
+                                    <span class="text-muted small d-block">Comprobantes de pago:</span>
+                                    @foreach (var c in pago.Comprobantes)
+                                    {
+                                        <span class="badge bg-info-subtle text-info-emphasis d-block text-start mt-1">📎 @c.NombreArchivoOriginal (@c.TipoContenido) · @c.TamanoBytes bytes</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+
+            <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+                <h3 class="h5 fw-bold mb-3">Actividades / Eventos</h3>
+                @if (Model.Eventos == null || !Model.Eventos.Any())
+                {
+                    <p class="text-muted small mb-0">Sin actividades registradas para esta reserva.</p>
+                }
+                else
+                {
+                    foreach (var e in Model.Eventos)
+                    {
+                        <div class="p-3 rounded-3 bg-light border mb-2">
+                            <div class="d-flex justify-content-between align-items-baseline">
+                                <strong>@e.Nombre</strong>
+                                <span class="badge bg-secondary">@e.Tipo</span>
+                            </div>
+                            <span class="text-muted small">Fecha: @e.Fecha · Estado: @e.Estado · Esporádico: @(e.EsSporadico ? "Sí" : "No")</span>
+                            @if (!string.IsNullOrWhiteSpace(e.CentroAtractivo))
+                            {
+                                <span class="text-muted small">Centro atractivo: @e.CentroAtractivo</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(e.Proveedor))
+                            {
+                                <span class="text-muted small">Proveedor: @e.Proveedor</span>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+
+            <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+                <h3 class="h5 fw-bold mb-3">Logística de transporte</h3>
+                @if (Model.Transportes == null || !Model.Transportes.Any())
+                {
+                    <p class="text-muted small mb-0">Sin asignaciones de transporte registradas.</p>
+                }
+                else
+                {
+                    foreach (var t in Model.Transportes)
+                    {
+                        <div class="p-3 rounded-3 bg-light border mb-2">
+                            <div class="d-flex justify-content-between align-items-baseline">
+                                <strong>@t.Motivo</strong>
+                                <span class="badge bg-secondary">@t.Estado</span>
+                            </div>
+                            <span class="text-muted small">Vehículo: @t.VehiculoTipo @(string.IsNullOrWhiteSpace(t.Placas) ? "" : $"· Placas: {t.Placas}")</span>
+                            <span class="text-muted small">Conductor: @(string.IsNullOrWhiteSpace(t.Conductor) ? "Por asignar" : t.Conductor)</span>
+                            <span class="text-muted small">Recogida: @t.FechaRecogida · Devolución: @t.FechaDevolucion</span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 105px;">
+                <div class="auth-card p-4 shadow-sm" style="max-width: 100%;">
+                    <h3 class="h5 fw-bold mb-3">Tareas del administrador</h3>
+                    <div class="d-grid gap-2">
+                        @if (Model.Estado == HuatulcoTravel.Models.EstadoReservacion.PendienteDePago
+                            || Model.Estado == HuatulcoTravel.Models.EstadoReservacion.ComprobanteEnviado
+                            || Model.Estado == HuatulcoTravel.Models.EstadoReservacion.EnRevision)
+                        {
+                            <form method="post" asp-area="Admin" asp-controller="Pagos" asp-action="Aprobar">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="button button-gold w-100 text-center">✔ Aprobar pago y liberar casa</button>
+                            </form>
+                        }
+                        @if (Model.Estado != HuatulcoTravel.Models.EstadoReservacion.Cancelada
+                            && Model.Estado != HuatulcoTravel.Models.EstadoReservacion.Finalizada
+                            && Model.Estado != HuatulcoTravel.Models.EstadoReservacion.Expirada)
+                        {
+                            <form method="post" asp-area="Admin" asp-controller="Reservaciones" asp-action="Cancelar">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-outline-danger w-100 rounded-pill py-2 fw-bold">Cancelar reserva</button>
+                            </form>
+                        }
+                    </div>
+                    <p class="text-muted small text-center mt-3 mb-0">La liberación de la casa se realiza al aprobar el pago de la reserva.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

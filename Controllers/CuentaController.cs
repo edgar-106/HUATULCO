@@ -8,7 +8,7 @@ public class CuentaController : Controller {
   if(!ModelState.IsValid)return View(model); var user=await _users.FindByEmailAsync(model.Email.Trim());
   if(user is null||!user.Activo){ModelState.AddModelError(string.Empty,"Correo o contraseña incorrectos.");return View(model);}
   var result=await _signIn.PasswordSignInAsync(user.UserName!,model.Password,model.RememberMe,true);
-  if(result.Succeeded){if(!string.IsNullOrWhiteSpace(model.ReturnUrl)&&Url.IsLocalUrl(model.ReturnUrl))return LocalRedirect(model.ReturnUrl); if(await _users.IsInRoleAsync(user,"Administrador"))return RedirectToAction("Index","Alojamientos",new{area="Admin"}); return RedirectToAction("Index","Home");}
+  if(result.Succeeded){if(!string.IsNullOrWhiteSpace(model.ReturnUrl)&&Url.IsLocalUrl(model.ReturnUrl))return LocalRedirect(model.ReturnUrl); if(await _users.IsInRoleAsync(user,"Administrador"))return RedirectToAction("Index","Reservaciones",new{area="Admin"}); return RedirectToAction("Index","Home");}
   ModelState.AddModelError(string.Empty,result.IsLockedOut?"Cuenta bloqueada temporalmente.":"Correo o contraseña incorrectos."); return View(model);
  }
  [HttpGet] public IActionResult Registro(){if(User.Identity?.IsAuthenticated==true)return RedirectToAction("Index","Home");return View(new RegistroViewModel());}

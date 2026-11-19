@@ -16,6 +16,8 @@ public class ApplicationDbContext
     public DbSet<Reservacion> Reservaciones => Set<Reservacion>();
     public DbSet<Pago> Pagos => Set<Pago>();
     public DbSet<ComprobantePago> ComprobantesPago => Set<ComprobantePago>();
+    public DbSet<Evento> Evento => Set<Evento>();
+    public DbSet<Transporte> Transporte => Set<Transporte>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -62,5 +64,38 @@ public class ApplicationDbContext
             .WithMany(x => x.Comprobantes)
             .HasForeignKey(x => x.PagoId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Evento>(entity =>
+        {
+            entity.HasIndex(x => new { x.AlojamientoId, x.Fecha });
+
+            entity.Property(x => x.Tipo).HasConversion<string>();
+            entity.Property(x => x.Estado).HasConversion<string>();
+
+            entity.HasOne(x => x.Alojamiento)
+                .WithMany()
+                .HasForeignKey(x => x.AlojamientoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Usuario)
+                .WithMany()
+                .HasForeignKey(x => x.UsuarioId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(x => x.Reservacion)
+                .WithMany(x => x.Eventos)
+                .HasForeignKey(x => x.ReservacionId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        builder.Entity<Transporte>(entity =>
+        {
+            entity.Property(x => x.Estado).HasConversion<string>();
+
+            entity.HasOne(x => x.Reservacion)
+                .WithMany(x => x.Transportes)
+                .HasForeignKey(x => x.ReservacionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

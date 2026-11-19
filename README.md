@@ -29,10 +29,23 @@ Plataforma moderna de reservas, hospedaje y experiencias turísticas en Bahías 
   - Registro seguro de clientes (`/Cuenta/Registro`).
   - Inicio de sesión (`/Cuenta/Ingresar`) con protección contra ataques de fuerza bruta y bloqueo temporal.
   - Roles definidos: `Administrador`, `Cliente`, `Operativo`, `Proveedor`.
-- **Panel de Administración (`/Admin/Alojamientos`)**:
-  - CRUD completo para gestionar residencias.
-  - Subida múltiple de fotografías (`JPG`, `PNG`, `WEBP`) con validación de magic bytes (máximo 5 MB por archivo).
-  - Baja lógica (*soft delete*) para proteger el historial de reservas y pagos.
+- **Panel de Administración (`/Admin/Reservaciones`)**: 
+  - Gestión de reservaciones de las residencias (habitaciones, departamentos y casas).
+  - Filtros por residencia y estado de reserva.
+  - Detalle de reserva con huésped, período, montos y actividades vinculadas.
+  - Cancelación de reservas y confirmación de reservas aprobadas.
+- **Validación de Pagos (`/Admin/Pagos`)**: 
+  - Revisión de comprobantes de pago (transferencias, depósitos, Oxxo, etc.) subidos por los clientes.
+  - Aprobación o rechazo del pago.
+  - Al aprobar: pago `Aprobado` y liberación de la reserva (casa) hacia el cliente (`Confirmada`).
+- **Control de Eventos (`/Admin/Eventos`)**: 
+  - Registro y clasificación de eventos: culturales, deportivos y sociales.
+  - Modalidad *fija* o *esporádica*.
+  - Vinculación de eventos con la residencia y el huésped.
+  - Coordinación con centros atractivos externos (proveedores de tours, paseos en lancha, etc.).
+- **Logística de Transporte (`/Admin/Transportes`)**: 
+  - Asignación de vehículo para traslados de huéspedes sin auto.
+  - Control de recogida, conducción y devolución.
 
 ---
 
@@ -113,7 +126,7 @@ La aplicación se iniciará y escuchará en todas las interfaces de red:
 | **Detalle** | `/Alojamientos/Detalle/{id}` | Ficha completa, mapa grande y botón de ruta GPS. |
 | **Ingreso** | `/Cuenta/Ingresar` | Formulario de inicio de sesión. |
 | **Registro** | `/Cuenta/Registro` | Alta de nuevos clientes. |
-| **Panel Admin** | `/Admin/Alojamientos` | Gestión administrativa de propiedades (requiere rol `Administrador`). |
+| **Panel Admin** | `/Admin/Reservaciones` | Panel administrativo de reservaciones, pagos, eventos y transporte (requiere rol `Administrador`). |
 
 ### Credenciales del Administrador por Defecto:
 - **Correo**: `admin@huatulcotravel.com`

@@ -1,0 +1,74 @@
+@model HuatulcoTravel.Models.Transporte
+@{
+    ViewData["Title"] = "Nueva asignación de transporte";
+}
+
+<section class="section-wrap" style="padding-top: 48px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="p-4 rounded-4 bg-white border shadow-sm">
+                <div class="section-heading mb-4">
+                    <div>
+                        <p class="eyebrow">PANEL ADMINISTRATIVO</p>
+                        <h2>Nueva asignación de transporte</h2>
+                    </div>
+                </div>
+
+                <form asp-area="Admin" asp-controller="Transportes" asp-action="Crear" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold" for="ReservacionId">Reserva</label>
+                        <select name="ReservacionId" id="ReservacionId" class="form-select" required>
+                            @foreach (var r in (IEnumerable<HuatulcoTravel.Models.Reservacion>)ViewData["Reservaciones"])
+                            {
+                                <option value="@r.Id">@r.Folio · @(r.Alojamiento?.Nombre ?? "Sin residencia") · @r.NombreHuesped</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold" for="Motivo">Motivo</label>
+                        <input type="text" name="Motivo" id="Motivo" class="form-control" value="@Model.Motivo" placeholder="Ej. Traslado a tour en lancha" required />
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold" for="VehiculoTipo">Tipo de vehículo</label>
+                            <input type="text" name="VehiculoTipo" id="VehiculoTipo" class="form-control" value="@Model.VehiculoTipo" placeholder="Ej. Van, Camioneta, Taxi" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold" for="Placas">Placas</label>
+                            <input type="text" name="Placas" id="Placas" class="form-control" value="@Model.Placas" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold" for="Conductor">Conductor</label>
+                            <input type="text" name="Conductor" id="Conductor" class="form-control" value="@Model.Conductor" />
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold" for="FechaRecogida">Fecha de recogida</label>
+                            <input type="date" name="FechaRecogida" id="FechaRecogida" class="form-control" value="@Model.FechaRecogida" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold" for="FechaDevolucion">Fecha de devolución</label>
+                            <input type="date" name="FechaDevolucion" id="FechaDevolucion" class="form-control" value="@Model.FechaDevolucion" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold" for="Notas">Notas</label>
+                        <textarea name="Notas" id="Notas" class="form-control" rows="3">@Model.Notas</textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">Guardar asignación</button>
+                        <a class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold" asp-area="Admin" asp-controller="Transportes" asp-action="Index">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

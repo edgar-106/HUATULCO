@@ -1,0 +1,83 @@
+@model IEnumerable<HuatulcoTravel.Models.Pago>
+@{
+    ViewData["Title"] = "Validación de pagos";
+}
+
+<section class="section-wrap" style="padding-top: 48px;">
+    <div class="section-heading mb-4">
+        <div>
+            <p class="eyebrow">PANEL ADMINISTRATIVO</p>
+            <h2>Validación de pagos</h2>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-card">
+            <span class="empty-icon">✅</span>
+            <h3>Sin pagos en revisión</h3>
+            <p>No hay comprobantes de pago pendientes de validación.</p>
+        </div>
+    }
+
+    @foreach (var pago in Model)
+    {
+        var reservacion = pago.Reservacion;
+        <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                    <h3 class="h5 fw-bold mb-1">@pago.Metodo</h3>
+                    <span class="text-muted small">Pago registrado: @pago.FechaRegistroUtc</span>
+                </div>
+                <strong class="fs-5" style="color: var(--sea);">@pago.Importe.ToString("C")</strong>
+            </div>
+
+            <hr />
+
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Folio de la reserva</span>
+                    <strong>@(reservacion?.Folio ?? "Sin reserva")</strong>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Residencia</span>
+                    <strong>@(reservacion?.Alojamiento?.Nombre ?? "Sin residencia")</strong>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Huésped</span>
+                    <strong>@(reservacion?.NombreHuesped ?? "Sin huésped")</strong>
+                </div>
+            </div>
+
+            <hr />
+
+            <h4 class="h6 fw-bold mb-2">Comprobantes de pago</h4>
+            @if (pago.Comprobantes == null || !pago.Comprobantes.Any())
+            {
+                <p class="text-muted small mb-0">Sin comprobantes adjuntos.</p>
+            }
+            else
+            {
+                foreach (var c in pago.Comprobantes)
+                {
+                    <div class="p-2 rounded-3 bg-light border mb-2 d-flex justify-content-between align-items-center">
+                        <span class="small">📎 @c.NombreArchivoOriginal <span class="text-muted">(@c.TipoContenido)</span></span>
+                        <span class="small text-muted">@c.TamanoBytes bytes</span>
+                    </div>
+                }
+            }
+            <hr />
+
+            <div class="d-flex gap-2">
+                <form method="post" asp-area="Admin" asp-controller="Pagos" asp-action="Aprobar" class="flex-fill">
+                    <input type="hidden" name="id" value="@pago.Id" />
+                    <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold">✔ Aprobar pago y liberar casa</button>
+                </form>
+                <form method="post" asp-area="Admin" asp-controller="Pagos" asp-action="Rechazar" class="flex-fill">
+                    <input type="hidden" name="id" value="@pago.Id" />
+                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill py-2 fw-bold">✖ Rechazar</button>
+                </form>
+            </div>
+        </div>
+    }
+</section>

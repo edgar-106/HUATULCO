@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthorization();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("No se configuró ConnectionStrings:DefaultConnection.");
@@ -40,6 +41,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddScoped<IAlojamientoService, AlojamientoService>();
+builder.Services.AddScoped<IReservacionService, ReservacionService>();
+builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<IEventoService, EventoService>();
+builder.Services.AddScoped<ITransporteService, TransporteService>();
 
 var app = builder.Build();
 

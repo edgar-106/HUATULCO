@@ -27,7 +27,7 @@
             {
                 @if (User.IsInRole("Administrador"))
                 {
-                    <a class="nav-admin-badge" asp-area="Admin" asp-controller="Alojamientos" asp-action="Index">Panel Admin</a>
+                    <a class="nav-admin-badge" asp-area="Admin" asp-controller="Reservaciones" asp-action="Index">Panel Admin</a>
                 }
                 <span class="nav-user-greeting">Hola, @(User.Identity.Name?.Split('@')[0] ?? "Usuario")</span>
                 <form asp-controller="Cuenta" asp-action="Salir" method="post" class="d-inline m-0 p-0">
@@ -77,7 +77,7 @@
 
             @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Administrador"))
             {
-                <a class="mobile-nav-link" asp-area="Admin" asp-controller="Alojamientos" asp-action="Index" style="background: #eef5f5; color: var(--sea); font-weight: 700;">
+                <a class="mobile-nav-link" asp-area="Admin" asp-controller="Reservaciones" asp-action="Index" style="background: #eef5f5; color: var(--sea); font-weight: 700;">
                     <span>⚙️</span> Panel Administrativo
                 </a>
             }
